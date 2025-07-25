@@ -4,19 +4,27 @@ services:
     build: ./Supervisor
     ports:
       - "8080:8080"
+    environment:
+      - WORKER_INFO_DATABASE_URL=postgres://admin:admin@worker-info-db:5432/worker-info?sslmode=disable
+      - JOB_INFO_DATABASE_URL=postgres://admin:admin@job-info-db:5433/job-info?sslmode=disable
+      - REDIS_URL=redis://redis:6379
     volumes:
       - ./Supervisor:/app
       - ./proto:/app/proto
     depends_on:
-      - worker-info
-      - job-info
-      - scraping-data
+      - worker-info-db
+      - job-info-db
+      - scraping-data-db
       - redis
 
   worker:
     build: ./Worker
     ports:
       - "8081:8081"
+    environment:
+      - WORKER_INFO_DATABASE_URL=postgres://admin:admin@worker-info-db:5432/worker-info?sslmode=disable
+      - JOB_INFO_DATABASE_URL=postgres://admin:admin@job-info-db:5433/job-info?sslmode=disable
+      - REDIS_URL=redis://redis:6379
     volumes:
       - ./Worker:/app
       - ./proto:/app/proto
@@ -89,9 +97,9 @@ services:
     volumes:
       - pgadmin-data:/var/lib/pgadmin
     depends_on:
-      - worker-info
-      - job-info
-      - scraping-data
+      - worker-info-db
+      - job-info-db
+      - scraping-data-db
     restart: unless-stopped
 
 volumes:
