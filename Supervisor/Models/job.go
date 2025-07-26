@@ -5,7 +5,7 @@ import "time"
 type Job struct {
 	Id            int       `json:"id" db:"id,primarykey"`
 	Name          string    `json:"name"`
-	Status        string    `json:"status" db:"status,index"` //(pending, running, completed, scheduled	)
+	Status        string    `json:"status" db:"status,index"` //(scheduled, pending, running, completed	)
 	URLSeedSearch string    `json:"url_seed_search"`
 	LastResult    string    `json:"last_result"`
 	Cron          string    `json:"cron"`

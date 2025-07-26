@@ -71,18 +71,18 @@ func UpdateJob(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	if updateRequest.Name != "" {
-		existingJob.Name = updateRequest.Name
+	// nt:: change to use case?
+	if updateRequest.Name != nil {
+		existingJob.Name = *updateRequest.Name
 	}
-	if updateRequest.URLSeedSearch != "" {
-		existingJob.URLSeedSearch = updateRequest.URLSeedSearch
+	if updateRequest.URLSeedSearch != nil {
+		existingJob.URLSeedSearch = *updateRequest.URLSeedSearch
 	}
-	if updateRequest.Cron != "" {
-		existingJob.Cron = updateRequest.Cron
+	if updateRequest.Cron != nil {
+		existingJob.Cron = *updateRequest.Cron
 	}
-	if updateRequest.IsActive == (true || false) {
-		existingJob.IsActive = updateRequest.IsActive
+	if updateRequest.IsActive != nil {
+		existingJob.IsActive = *updateRequest.IsActive
 	}
 
 	updatedJob, err := Services.UpdateJob(existingJob)

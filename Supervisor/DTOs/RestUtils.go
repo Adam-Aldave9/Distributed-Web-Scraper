@@ -7,10 +7,10 @@ type CreateJobRequest struct {
 }
 
 type UpdateJobRequest struct {
-	Name          string `json:"name"`
-	URLSeedSearch string `json:"url_seed_search"`
-	Cron          string `json:"cron"`
-	IsActive      bool   `json:"is_active"`
+	Name          *string `json:"name"`
+	URLSeedSearch *string `json:"url_seed_search"`
+	Cron          *string `json:"cron"`
+	IsActive      *bool   `json:"is_active"`
 }
 
 type CreateJobCronEntryRequest struct {
