@@ -29,8 +29,6 @@ func GetJobById(id int) (Models.Job, error) {
 }
 
 func CreateJob(job Models.Job) (Models.Job, error) {
-	// Calculate next run time based on cron expression
-
 	job.Status = "scheduled"
 	job.IsActive = true
 	job.NextRun = ""
@@ -75,7 +73,6 @@ func DeleteJob(id int) (string, error) { //nt:: check raw
 	result := Models.JobDB.Where("job_id = ?", id).First(&jobCronEntry)
 
 	if result.Error == nil {
-		// Record exists, remove from scheduler
 		Models.CronScheduler.Remove(jobCronEntry.EntryId)
 	}
 
@@ -102,11 +99,8 @@ func LoadAndScheduleAllJobs() error {
 	return nil
 }
 
-//----------------------Helpers--------------------------------
-
-// Helper function to schedule a job in the global cron scheduler
+// ----------------------Helpers--------------------------------
 func scheduleJob(job Models.Job) { //nt:: check raw
-	// add return bad response if error
 	entryID, err := Models.CronScheduler.AddFunc(job.Cron, func() {
 		executeJob(job)
 	})
@@ -156,17 +150,10 @@ func scheduleJob(job Models.Job) { //nt:: check raw
 }
 
 func executeJob(job Models.Job) {
-	// TODO4: Implement job execution logic
-	// This could involve:
-	// 1. Updating job status to "pending"
-	// 2. Sending job to workers via redis
-	// update next run after job completion. gRPC from worker?
-	// update last run in worker node when status is set to running. gRPC for this
 	Models.JobDB.Raw("UPDATE jobs SET status = 'pending' WHERE id = ?", job.Id)
 	ctx := context.Background()
 	queueName := "scraping_jobs"
 
-	// Create job payload for Redis
 	jobPayload := map[string]interface{}{
 		"job_id":          job.Id,
 		"name":            job.Name,
@@ -174,7 +161,6 @@ func executeJob(job Models.Job) {
 		"status":          "pending",
 	}
 
-	// Serialize job payload to JSON
 	jobJSON, err := json.Marshal(jobPayload)
 	if err != nil {
 		Models.JobDB.Raw("UPDATE jobs SET last_result = 'failed' WHERE id = ?", job.Id)
@@ -182,10 +168,8 @@ func executeJob(job Models.Job) {
 		return
 	}
 
-	// Push job to Redis queue
 	err = Models.RedisClient.LPush(ctx, queueName, jobJSON).Err()
 	if err != nil {
-		// Log error and update job status to failed
 		Models.JobDB.Raw("UPDATE jobs SET last_result = 'failed' WHERE id = ?", job.Id)
 		Models.JobDB.Raw("UPDATE jobs SET status = 'scheduled' WHERE id = ?", job.Id)
 		return
