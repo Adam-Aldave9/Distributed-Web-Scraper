@@ -55,7 +55,6 @@ func (s *SupervisorGRPCServer) RegisterWorker(ctx context.Context, req *pb.Regis
 
 	log.Printf("Received worker registration: %s (host: %s, port: %d)", req.WorkerId, req.HostName, req.Port)
 
-	// Create or update worker in database
 	worker := Models.Worker{
 		Name:          req.WorkerId,
 		Status:        "active",
@@ -65,7 +64,6 @@ func (s *SupervisorGRPCServer) RegisterWorker(ctx context.Context, req *pb.Regis
 		UpdatedAt:     time.Now(),
 	}
 
-	// Use FirstOrCreate to handle existing workers
 	if Models.WorkerDB != nil {
 		result := Models.WorkerDB.Where("name = ?", req.WorkerId).FirstOrCreate(&worker)
 		if result.Error != nil {
@@ -76,7 +74,7 @@ func (s *SupervisorGRPCServer) RegisterWorker(ctx context.Context, req *pb.Regis
 			}, nil
 		}
 
-		// Update existing worker with new host info
+		// update existing worker with new host info
 		if result.RowsAffected == 0 {
 			Models.WorkerDB.Model(&worker).Updates(Models.Worker{
 				Status:        "active",
@@ -101,11 +99,9 @@ func (s *SupervisorGRPCServer) HealthHeartbeatStream(stream pb.SupervisorService
 	for {
 		req, err := stream.Recv()
 		if err != nil {
-			// Stream ended (client closed or error)
 			if heartbeatCount > 0 {
 				log.Printf("Heartbeat stream ended for worker %s after %d heartbeats", lastWorkerId, heartbeatCount)
 			}
-			// Send final response
 			return stream.SendAndClose(&pb.HealthHeartbeatResponse{
 				Success: true,
 				Message: fmt.Sprintf("Received %d heartbeats", heartbeatCount),
@@ -113,7 +109,7 @@ func (s *SupervisorGRPCServer) HealthHeartbeatStream(stream pb.SupervisorService
 		}
 
 		if req.WorkerId == "" {
-			continue // Skip invalid heartbeats
+			continue
 		}
 
 		lastWorkerId = req.WorkerId
@@ -122,7 +118,6 @@ func (s *SupervisorGRPCServer) HealthHeartbeatStream(stream pb.SupervisorService
 		log.Printf("Received heartbeat #%d from worker %s (CPU: %.2f%%, Memory: %.2f%%, Status: %s)",
 			heartbeatCount, req.WorkerId, req.CpuUsage, req.MemoryUsage, req.Status)
 
-		// Update worker's last heartbeat and health metrics
 		if Models.WorkerDB != nil {
 			result := Models.WorkerDB.Model(&Models.Worker{}).
 				Where("name = ?", req.WorkerId).
@@ -158,7 +153,6 @@ func (s *SupervisorGRPCServer) LogCompletionStatus(ctx context.Context, req *pb.
 		}, nil
 	}
 
-	// Update job in database with completion data
 	updateQuery := `UPDATE jobs SET
 		status = ?,
 		last_result = ?,
@@ -214,7 +208,6 @@ func StartGRPCServerWithConfig(config GRPCConfig) error {
 		return fmt.Errorf("failed to listen on %s: %w", address, err)
 	}
 
-	// Configure gRPC server with keepalive settings
 	grpcServer := grpc.NewServer(
 		grpc.KeepaliveParams(keepalive.ServerParameters{
 			MaxConnectionIdle: 5 * time.Minute,

@@ -31,7 +31,6 @@ func DefaultWorkerServerConfig() WorkerServerConfig {
 	}
 }
 
-// RestartSignal is sent when a restart is requested
 type RestartSignal struct{}
 
 // WorkerGRPCServer implements the WorkerService gRPC server
@@ -64,9 +63,7 @@ func NewWorkerGRPCServerWithRestart(shutdownChan chan os.Signal, restartChan cha
 func (s *WorkerGRPCServer) Shutdown(ctx context.Context, req *emptypb.Empty) (*pb.ShutdownResponse, error) {
 	log.Println("Received shutdown request via gRPC")
 
-	// Send shutdown signal to main process asynchronously
 	go func() {
-		// Small delay to allow response to be sent
 		time.Sleep(100 * time.Millisecond)
 		s.shutdownChan <- os.Interrupt
 	}()
@@ -81,9 +78,7 @@ func (s *WorkerGRPCServer) Shutdown(ctx context.Context, req *emptypb.Empty) (*p
 func (s *WorkerGRPCServer) Restart(ctx context.Context, req *emptypb.Empty) (*pb.RestartResponse, error) {
 	log.Println("Received restart request via gRPC")
 
-	// Send restart signal asynchronously
 	go func() {
-		// Small delay to allow response to be sent
 		time.Sleep(100 * time.Millisecond)
 		if s.restartChan != nil {
 			select {
@@ -94,7 +89,6 @@ func (s *WorkerGRPCServer) Restart(ctx context.Context, req *emptypb.Empty) (*pb
 				s.shutdownChan <- os.Interrupt
 			}
 		} else {
-			// Fall back to shutdown if no restart channel configured
 			log.Println("No restart channel configured, falling back to shutdown")
 			s.shutdownChan <- os.Interrupt
 		}
@@ -119,7 +113,6 @@ func StartGRPCServerWithConfig(shutdownChan chan os.Signal, config WorkerServerC
 		return fmt.Errorf("failed to listen on %s: %w", address, err)
 	}
 
-	// Configure gRPC server with keepalive settings
 	grpcServer := grpc.NewServer(
 		grpc.KeepaliveParams(keepalive.ServerParameters{
 			MaxConnectionIdle: 5 * time.Minute,

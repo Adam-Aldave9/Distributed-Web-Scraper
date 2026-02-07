@@ -193,7 +193,6 @@ func RegisterWorker(ctx context.Context, workerId string) error {
 		return fmt.Errorf("supervisor client connection lost")
 	}
 
-	// Use provided workerId or fall back to config
 	if workerId == "" {
 		workerId = config.WorkerID
 	}
@@ -270,7 +269,6 @@ func StartHeartbeatStream(ctx context.Context, interval time.Duration) error {
 		running:  true,
 	}
 
-	// Start the heartbeat sender goroutine
 	go func() {
 		ticker := time.NewTicker(interval)
 		defer ticker.Stop()
@@ -310,8 +308,8 @@ func StartHeartbeatStream(ctx context.Context, interval time.Duration) error {
 				req := &pb.HealthHeartbeatRequest{
 					WorkerId:    workerId,
 					Timestamp:   time.Now().Format(time.RFC3339),
-					CpuUsage:    0, // TODO: Get actual CPU usage
-					MemoryUsage: 0, // TODO: Get actual memory usage
+					CpuUsage:    0, // TODO: get actual CPU usage
+					MemoryUsage: 0, // TODO: get actual memory usage
 					Status:      "active",
 				}
 
@@ -340,14 +338,11 @@ func StopHeartbeatStream() {
 }
 
 // SendHealthHeartbeat sends a single health heartbeat (for backwards compatibility)
-// Note: For continuous heartbeats, use StartHeartbeatStream instead
 func SendHealthHeartbeat(ctx context.Context, workerId string) error {
 	return SendHealthHeartbeatWithMetrics(ctx, workerId, 0, 0, "active")
 }
 
 // SendHealthHeartbeatWithMetrics sends a single health heartbeat with resource metrics
-// Note: This opens a stream, sends one heartbeat, and closes the stream
-// For continuous heartbeats, use StartHeartbeatStream instead
 func SendHealthHeartbeatWithMetrics(ctx context.Context, workerId string, cpuUsage, memoryUsage float64, status string) error {
 	sc := GetSupervisorClient()
 	if sc == nil {
@@ -363,12 +358,10 @@ func SendHealthHeartbeatWithMetrics(ctx context.Context, workerId string, cpuUsa
 		return fmt.Errorf("supervisor client connection lost")
 	}
 
-	// Use provided workerId or fall back to config
 	if workerId == "" {
 		workerId = config.WorkerID
 	}
 
-	// Open a stream, send one heartbeat, and close
 	stream, err := client.HealthHeartbeatStream(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to open heartbeat stream: %w", err)

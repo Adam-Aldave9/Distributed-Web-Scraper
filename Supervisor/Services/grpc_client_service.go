@@ -43,19 +43,16 @@ func ShutdownWorker(workerId string) error {
 
 // ShutdownWorkerWithConfig sends a graceful shutdown request with custom config
 func ShutdownWorkerWithConfig(workerId string, config WorkerClientConfig) error {
-	// Convert workerId to int
 	id, err := strconv.Atoi(workerId)
 	if err != nil {
 		return fmt.Errorf("invalid worker ID format: %s", workerId)
 	}
 
-	// Get worker details from database
 	worker, err := GetWorkerById(id)
 	if err != nil {
 		return fmt.Errorf("failed to get worker with ID %d: %w", id, err)
 	}
 
-	// Connect to worker's gRPC server
 	address := fmt.Sprintf("%s:%s", worker.HostName, config.Port)
 	ctx, cancel := context.WithTimeout(context.Background(), config.ConnectTimeout)
 	defer cancel()
@@ -69,14 +66,11 @@ func ShutdownWorkerWithConfig(workerId string, config WorkerClientConfig) error 
 	}
 	defer conn.Close()
 
-	// Create worker service client
 	client := pb.NewWorkerServiceClient(conn)
 
-	// Create context with timeout for the request
 	reqCtx, reqCancel := context.WithTimeout(context.Background(), config.RequestTimeout)
 	defer reqCancel()
 
-	// Call shutdown method
 	response, err := client.Shutdown(reqCtx, &emptypb.Empty{})
 	if err != nil {
 		return fmt.Errorf("failed to shutdown worker %s: %w", workerId, err)
@@ -84,7 +78,6 @@ func ShutdownWorkerWithConfig(workerId string, config WorkerClientConfig) error 
 
 	log.Printf("Worker %s shutdown successfully: %s at %s", workerId, response.Message, response.Timestamp)
 
-	// Update worker status in database
 	if Models.WorkerDB != nil {
 		Models.WorkerDB.Model(&Models.Worker{}).
 			Where("id = ?", id).
@@ -104,19 +97,16 @@ func RestartWorker(workerId string) error {
 
 // RestartWorkerWithConfig sends a restart request to a worker with custom config
 func RestartWorkerWithConfig(workerId string, config WorkerClientConfig) error {
-	// Convert workerId to int
 	id, err := strconv.Atoi(workerId)
 	if err != nil {
 		return fmt.Errorf("invalid worker ID format: %s", workerId)
 	}
 
-	// Get worker details from database
 	worker, err := GetWorkerById(id)
 	if err != nil {
 		return fmt.Errorf("failed to get worker with ID %d: %w", id, err)
 	}
 
-	// Connect to worker's gRPC server
 	address := fmt.Sprintf("%s:%s", worker.HostName, config.Port)
 	ctx, cancel := context.WithTimeout(context.Background(), config.ConnectTimeout)
 	defer cancel()
@@ -130,22 +120,18 @@ func RestartWorkerWithConfig(workerId string, config WorkerClientConfig) error {
 	}
 	defer conn.Close()
 
-	// Create worker service client
 	client := pb.NewWorkerServiceClient(conn)
 
-	// Create context with timeout for the request
 	reqCtx, reqCancel := context.WithTimeout(context.Background(), config.RequestTimeout)
 	defer reqCancel()
 
-	// Call restart method
 	response, err := client.Restart(reqCtx, &emptypb.Empty{})
 	if err != nil {
-		return fmt.Errorf("failed to restart worker %s: %w", workerId, err)
+		return fmt.Errorf("failed to restart worker %s: %w\", workerId, err)
 	}
 
 	log.Printf("Worker %s restart initiated: %s at %s", workerId, response.Message, response.Timestamp)
 
-	// Update worker status in database
 	if Models.WorkerDB != nil {
 		Models.WorkerDB.Model(&Models.Worker{}).
 			Where("id = ?", id).
