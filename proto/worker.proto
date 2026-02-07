@@ -1,0 +1,23 @@
+syntax = "proto3";
+package proto;
+option go_package = "./proto";
+import "google/protobuf/empty.proto";
+
+// WorkerService defines RPCs that the Supervisor calls on the Worker
+// Worker -> receives these calls from Supervisor
+service WorkerService {
+    // Shutdown gracefully stops the worker
+    rpc Shutdown(google.protobuf.Empty) returns (ShutdownResponse);
+    // Restart triggers a graceful restart of the worker
+    rpc Restart(google.protobuf.Empty) returns (RestartResponse);
+}
+
+message ShutdownResponse {
+    string message = 1;
+    string timestamp = 2;
+}
+
+message RestartResponse {
+    string message = 1;
+    string timestamp = 2;
+}

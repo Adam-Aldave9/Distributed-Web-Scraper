@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	Models "supervisor/Models"
 	Services "supervisor/Services"
 	Routes "supervisor/routes"
@@ -21,6 +22,13 @@ func main() {
 	Models.InitializeCronScheduler()
 
 	Services.LoadAndScheduleAllJobs()
+
+	// Start gRPC server in a separate goroutine
+	go func() {
+		if err := Services.StartGRPCServer(); err != nil {
+			log.Printf("gRPC server error: %v", err)
+		}
+	}()
 
 	Routes.SetupRoutes(router)
 

@@ -1,0 +1,58 @@
+syntax = "proto3";
+package proto;
+option go_package = "./proto";
+import "google/protobuf/timestamp.proto";
+
+// SupervisorService defines RPCs that the Worker calls on the Supervisor
+// Supervisor -> receives these calls from Worker
+service SupervisorService {
+    // RegisterWorker registers a new worker with the supervisor
+    rpc RegisterWorker(RegisterWorkerRequest) returns (RegisterWorkerResponse);
+    // HealthHeartbeatStream receives a continuous stream of health updates from workers
+    rpc HealthHeartbeatStream(stream HealthHeartbeatRequest) returns (HealthHeartbeatResponse);
+    // LogCompletionStatus logs job completion status from workers
+    rpc LogCompletionStatus(CompletionStatusRequest) returns (CompletionStatusResponse);
+}
+
+message RegisterWorkerRequest {
+    string workerId = 1;
+    string hostName = 2;
+    int32 port = 3;
+}
+
+message RegisterWorkerResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message HealthHeartbeatRequest {
+    string workerId = 1;
+    string timestamp = 2;
+    double cpuUsage = 3;
+    double memoryUsage = 4;
+    string status = 5;
+}
+
+message HealthHeartbeatResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message CompletionStatusRequest {
+    int32 jobId = 1;
+    string jobName = 2;
+    string status = 3;
+    string urlSeedSearch = 4;
+    string lastResult = 5;
+    string cron = 6;
+    string lastRun = 7;
+    string nextRun = 8;
+    bool isActive = 9;
+    string workerId = 10;
+    google.protobuf.Timestamp completedAt = 11;
+}
+
+message CompletionStatusResponse {
+    bool success = 1;
+    string message = 2;
+}
