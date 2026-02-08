@@ -3,7 +3,9 @@ package Services
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
+	"sync"
 	"time"
 	DTOs "worker/DTOs"
 	Models "worker/Models"
@@ -17,7 +19,6 @@ type ScraperServiceWrapper struct {
 	*DTOs.ScraperService
 }
 
-// NewScraperService creates a new ScraperServiceWrapper
 func NewScraperService(redisClient *redis.Client, scrapingDB *gorm.DB, jobDB *gorm.DB) *ScraperServiceWrapper {
 	return &ScraperServiceWrapper{
 		ScraperService: &DTOs.ScraperService{
@@ -28,15 +29,19 @@ func NewScraperService(redisClient *redis.Client, scrapingDB *gorm.DB, jobDB *go
 	}
 }
 
-// StartListening listens for jobs on the Redis queue and processes them
 func (s *ScraperServiceWrapper) StartListening(ctx context.Context) {
 	queueName := "scraping_jobs"
 	log.Printf("Starting to listen for jobs on queue: %s", queueName)
 
+	sem := make(chan struct{}, 2) // semaphore to allow max 2 parallel scraping tasks per worker node
+	var wg sync.WaitGroup
+
 	for {
 		select {
 		case <-ctx.Done():
-			log.Println("Stopping scraper service...")
+			log.Println("Stopping scraper service, waiting for active jobs...")
+			wg.Wait()
+			log.Println("All active jobs completed.")
 			return
 		default:
 			// result[0] is queue name, result[1] is data
@@ -56,7 +61,14 @@ func (s *ScraperServiceWrapper) StartListening(ctx context.Context) {
 			}
 
 			jobData := result[1]
-			s.processJob(ctx, jobData)
+
+			sem <- struct{}{} // acquire slot. blocks if limit reached
+			wg.Add(1)
+			go func(data string) {
+				defer wg.Done()
+				defer func() { <-sem }()
+				s.processJob(ctx, data)
+			}(jobData)
 		}
 	}
 }
@@ -70,17 +82,15 @@ func (s *ScraperServiceWrapper) processJob(ctx context.Context, jobData string) 
 
 	log.Printf("Processing job: ID=%d, Name=%s, URL=%s", payload.JobID, payload.Name, payload.URLSeedSearch)
 
-	if err := s.scrapeURL(payload); err != nil{
+	if err := s.scrapeURL(payload); err != nil {
 		log.Printf("Error scraping URL for job %d: %v", payload.JobID, err)
 
-		// Send failure status to supervisor
 		if err := SendCompletionStatus(ctx, payload, "failed", "scraping failed"); err != nil {
 			log.Printf("Failed to send failure status to supervisor: %v", err)
 		}
 		return
 	}
 
-	// Send success status to supervisor
 	if err := SendCompletionStatus(ctx, payload, "completed", "success"); err != nil {
 		log.Printf("Failed to send completion status to supervisor: %v", err)
 	}
@@ -89,7 +99,17 @@ func (s *ScraperServiceWrapper) processJob(ctx context.Context, jobData string) 
 }
 
 func (s *ScraperServiceWrapper) scrapeURL(payload DTOs.JobPayload) error {
-	// TODO: implement actual scraping logic
+	s.updateJobStatus(payload.JobID, "running")
+
+	config := DefaultScrapeConfig()
+
+	totalItems, err := RunScrape(s.ScrapingDB, payload, config)
+	if err != nil {
+		s.updateJobResult(payload.JobID, fmt.Sprintf("error: %v (saved %d items before failure)", err, totalItems))
+		return err
+	}
+
+	s.updateJobResult(payload.JobID, fmt.Sprintf("scraped %d items", totalItems))
 	return nil
 }
 
