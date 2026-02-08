@@ -20,19 +20,19 @@ type ScrapeConfig struct {
 	PriceSelector    string
 	BrandSelector    string
 	URLSelector      string
-	NextPageSelector string // css selector for the "next page" link
+	NextPageSelector string // css selector for the next page link
 	MaxDepth         int    // max pagination pages to follow (0 = unlimited)
 }
 
 func DefaultScrapeConfig() ScrapeConfig {
 	return ScrapeConfig{
-		ItemSelector:     "article.product_pod",
-		TitleSelector:    "h3 a",
-		PriceSelector:    ".price_color",
-		BrandSelector:    "",
-		URLSelector:      "h3 a",
-		NextPageSelector: "li.next a",
-		MaxDepth:         50,
+		ItemSelector:     "div[data-item-id]",
+		TitleSelector:    "span[data-automation-id='product-title']",
+		PriceSelector:    "div[data-automation-id='product-price'] span[itemprop='price']",
+		BrandSelector:    "span[data-automation-id='product-brand']",
+		URLSelector:      "a[link-identifier='product-title']",
+		NextPageSelector: "a[aria-label='Next page']",
+		MaxDepth:         10,
 	}
 }
 
@@ -161,7 +161,7 @@ func RunScrape(db *gorm.DB, payload DTOs.JobPayload, config ScrapeConfig) (int, 
 	return totalSaved, nil
 }
 
-// parsePrice extracts a float64 from a price string like "$12.34"
+// parsePrice extracts a float64 from a price string like $12.34
 func parsePrice(s string) float64 {
 	cleaned := strings.Map(func(r rune) rune {
 		if (r >= '0' && r <= '9') || r == '.' {
