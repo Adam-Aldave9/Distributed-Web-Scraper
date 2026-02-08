@@ -3,7 +3,9 @@ package Services
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
+	"sync"
 	"time"
 	DTOs "worker/DTOs"
 	Models "worker/Models"
@@ -28,15 +30,21 @@ func NewScraperService(redisClient *redis.Client, scrapingDB *gorm.DB, jobDB *go
 	}
 }
 
-// StartListening listens for jobs on the Redis queue and processes them
+// StartListening listens for jobs on the Redis queue and processes them.
+// Uses a semaphore to allow max 2 parallel scraping tasks per worker node.
 func (s *ScraperServiceWrapper) StartListening(ctx context.Context) {
 	queueName := "scraping_jobs"
 	log.Printf("Starting to listen for jobs on queue: %s", queueName)
 
+	sem := make(chan struct{}, 2) // max 2 parallel scraping tasks
+	var wg sync.WaitGroup
+
 	for {
 		select {
 		case <-ctx.Done():
-			log.Println("Stopping scraper service...")
+			log.Println("Stopping scraper service, waiting for active jobs...")
+			wg.Wait()
+			log.Println("All active jobs completed.")
 			return
 		default:
 			// result[0] is queue name, result[1] is data
@@ -56,7 +64,14 @@ func (s *ScraperServiceWrapper) StartListening(ctx context.Context) {
 			}
 
 			jobData := result[1]
-			s.processJob(ctx, jobData)
+
+			sem <- struct{}{} // acquire slot (blocks if 2 jobs running)
+			wg.Add(1)
+			go func(data string) {
+				defer wg.Done()
+				defer func() { <-sem }() // release slot
+				s.processJob(ctx, data)
+			}(jobData)
 		}
 	}
 }
@@ -89,7 +104,17 @@ func (s *ScraperServiceWrapper) processJob(ctx context.Context, jobData string) 
 }
 
 func (s *ScraperServiceWrapper) scrapeURL(payload DTOs.JobPayload) error {
-	// TODO: implement actual scraping logic
+	s.updateJobStatus(payload.JobID, "running")
+
+	config := DefaultScrapeConfig()
+
+	totalItems, err := RunScrape(s.ScrapingDB, payload, config)
+	if err != nil {
+		s.updateJobResult(payload.JobID, fmt.Sprintf("error: %v (saved %d items before failure)", err, totalItems))
+		return err
+	}
+
+	s.updateJobResult(payload.JobID, fmt.Sprintf("scraped %d items", totalItems))
 	return nil
 }
 
