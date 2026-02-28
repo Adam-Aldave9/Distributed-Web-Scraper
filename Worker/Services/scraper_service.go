@@ -14,22 +14,21 @@ import (
 	"gorm.io/gorm"
 )
 
-// wrapper for dto to avoid circular dependency
-type ScraperServiceWrapper struct {
-	*DTOs.ScraperService
+type ScraperService struct {
+	RedisClient *redis.Client
+	ScrapingDB  *gorm.DB
+	JobDB       *gorm.DB
 }
 
-func NewScraperService(redisClient *redis.Client, scrapingDB *gorm.DB, jobDB *gorm.DB) *ScraperServiceWrapper {
-	return &ScraperServiceWrapper{
-		ScraperService: &DTOs.ScraperService{
-			RedisClient: redisClient,
-			ScrapingDB:  scrapingDB,
-			JobDB:       jobDB,
-		},
+func NewScraperService(redisClient *redis.Client, scrapingDB *gorm.DB, jobDB *gorm.DB) *ScraperService {
+	return &ScraperService{
+		RedisClient: redisClient,
+		ScrapingDB:  scrapingDB,
+		JobDB:       jobDB,
 	}
 }
 
-func (s *ScraperServiceWrapper) StartListening(ctx context.Context) {
+func (s *ScraperService) StartListening(ctx context.Context) {
 	queueName := "scraping_jobs"
 	log.Printf("Starting to listen for jobs on queue: %s", queueName)
 
@@ -73,7 +72,7 @@ func (s *ScraperServiceWrapper) StartListening(ctx context.Context) {
 	}
 }
 
-func (s *ScraperServiceWrapper) processJob(ctx context.Context, jobData string) {
+func (s *ScraperService) processJob(ctx context.Context, jobData string) {
 	var payload DTOs.JobPayload
 	if err := json.Unmarshal([]byte(jobData), &payload); err != nil {
 		log.Printf("Error unmarshalling job payload: %v", err)
@@ -84,13 +83,15 @@ func (s *ScraperServiceWrapper) processJob(ctx context.Context, jobData string) 
 
 	if err := s.scrapeURL(payload); err != nil {
 		log.Printf("Error scraping URL for job %d: %v", payload.JobID, err)
+		s.updateJobStatus(payload.JobID, "failed")
 		return
 	}
 
+	s.updateJobStatus(payload.JobID, "completed")
 	log.Printf("Successfully completed job %d", payload.JobID)
 }
 
-func (s *ScraperServiceWrapper) scrapeURL(payload DTOs.JobPayload) error {
+func (s *ScraperService) scrapeURL(payload DTOs.JobPayload) error {
 	s.updateJobStatus(payload.JobID, "running")
 
 	config := DefaultScrapeConfig()
@@ -105,14 +106,14 @@ func (s *ScraperServiceWrapper) scrapeURL(payload DTOs.JobPayload) error {
 	return nil
 }
 
-func (s *ScraperServiceWrapper) updateJobStatus(jobID int, status string) {
+func (s *ScraperService) updateJobStatus(jobID int, status string) {
 	result := s.JobDB.Model(&Models.Job{}).Where("id = ?", jobID).Update("status", status)
 	if result.Error != nil {
 		log.Printf("Error updating job status for job %d: %v", jobID, result.Error)
 	}
 }
 
-func (s *ScraperServiceWrapper) updateJobResult(jobID int, lastResult string) {
+func (s *ScraperService) updateJobResult(jobID int, lastResult string) {
 	result := s.JobDB.Model(&Models.Job{}).Where("id = ?", jobID).Update("last_result", lastResult)
 	if result.Error != nil {
 		log.Printf("Error updating job result for job %d: %v", jobID, result.Error)

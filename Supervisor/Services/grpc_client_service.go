@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 	Models "supervisor/Models"
 	"time"
 
@@ -37,20 +36,15 @@ func DefaultWorkerClientConfig() WorkerClientConfig {
 }
 
 // ShutdownWorker sends a graceful shutdown request to a worker
-func ShutdownWorker(workerId string) error {
+func ShutdownWorker(workerId int) error {
 	return ShutdownWorkerWithConfig(workerId, DefaultWorkerClientConfig())
 }
 
 // ShutdownWorkerWithConfig sends a graceful shutdown request with custom config
-func ShutdownWorkerWithConfig(workerId string, config WorkerClientConfig) error {
-	id, err := strconv.Atoi(workerId)
+func ShutdownWorkerWithConfig(workerId int, config WorkerClientConfig) error {
+	worker, err := GetWorkerById(workerId)
 	if err != nil {
-		return fmt.Errorf("invalid worker ID format: %s", workerId)
-	}
-
-	worker, err := GetWorkerById(id)
-	if err != nil {
-		return fmt.Errorf("failed to get worker with ID %d: %w", id, err)
+		return fmt.Errorf("failed to get worker with ID %d: %w", workerId, err)
 	}
 
 	address := fmt.Sprintf("%s:%s", worker.HostName, config.Port)
@@ -73,14 +67,14 @@ func ShutdownWorkerWithConfig(workerId string, config WorkerClientConfig) error 
 
 	response, err := client.Shutdown(reqCtx, &emptypb.Empty{})
 	if err != nil {
-		return fmt.Errorf("failed to shutdown worker %s: %w", workerId, err)
+		return fmt.Errorf("failed to shutdown worker %d: %w", workerId, err)
 	}
 
-	log.Printf("Worker %s shutdown successfully: %s at %s", workerId, response.Message, response.Timestamp)
+	log.Printf("Worker %d shutdown successfully: %s at %s", workerId, response.Message, response.Timestamp)
 
 	if Models.WorkerDB != nil {
 		Models.WorkerDB.Model(&Models.Worker{}).
-			Where("id = ?", id).
+			Where("id = ?", workerId).
 			Updates(map[string]interface{}{
 				"status":     "shutdown",
 				"updated_at": time.Now(),

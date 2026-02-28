@@ -31,7 +31,7 @@ func GetJobById(id int) (Models.Job, error) {
 func CreateJob(job Models.Job) (Models.Job, error) {
 	job.Status = "scheduled"
 	job.IsActive = true
-	job.NextRun = ""
+	job.NextRun = nil
 
 	result := Models.JobDB.Create(&job)
 	if result.Error != nil {
@@ -49,7 +49,7 @@ func CreateJob(job Models.Job) (Models.Job, error) {
 func UpdateJob(job Models.Job) (Models.Job, error) { //nt:: check raw
 	// update next run if necessary
 	if job.Cron != "" {
-		job.NextRun = ""
+		job.NextRun = nil
 	}
 	result := Models.JobDB.Save(&job)
 	if result.Error != nil {
@@ -100,7 +100,7 @@ func LoadAndScheduleAllJobs() error {
 }
 
 // ----------------------Helpers--------------------------------
-func scheduleJob(job Models.Job) { //nt:: check raw
+func scheduleJob(job Models.Job) {
 	entryID, err := Models.CronScheduler.AddFunc(job.Cron, func() {
 		executeJob(job)
 	})
@@ -108,21 +108,21 @@ func scheduleJob(job Models.Job) { //nt:: check raw
 		// rollback
 		fmt.Println("Error scheduling job: ", err)
 		Models.JobDB.Delete(&job)
-		Models.JobDB.Raw("DELETE FROM job_cron_entries WHERE job_id = ?", job.Id)
+		Models.JobDB.Exec("DELETE FROM job_cron_entries WHERE job_id = ?", job.Id)
 		return
 	}
 
 	var cronJobExists bool
-	nextRun := Models.CronScheduler.Entry(entryID).Next.Format(time.RFC3339)
+	nextRun := Models.CronScheduler.Entry(entryID).Next
 	Models.JobDB.Raw("SELECT EXISTS (SELECT 1 FROM job_cron_entries WHERE job_id = ?)", job.Id).Scan(&cronJobExists)
 	fmt.Println("Cron job exists: ", cronJobExists)
 	if cronJobExists { // update existing job cron entry id and next run time
-		res := Models.JobDB.Raw("UPDATE job_cron_entries SET entry_id = ? WHERE job_id = ?", entryID, job.Id)
+		res := Models.JobDB.Exec("UPDATE job_cron_entries SET entry_id = ? WHERE job_id = ?", entryID, job.Id)
 		if res.Error != nil {
 			fmt.Println("Error updating job_cron_entries: ", res.Error)
 			return
 		}
-		res = Models.JobDB.Raw("UPDATE jobs SET next_run = ? WHERE id = ?", nextRun, job.Id)
+		res = Models.JobDB.Exec("UPDATE jobs SET next_run = ? WHERE id = ?", nextRun, job.Id)
 		if res.Error != nil {
 			fmt.Println("Error updating jobs next_run: ", res.Error)
 			return
@@ -150,7 +150,9 @@ func scheduleJob(job Models.Job) { //nt:: check raw
 }
 
 func executeJob(job Models.Job) {
-	Models.JobDB.Raw("UPDATE jobs SET status = 'pending' WHERE id = ?", job.Id)
+	now := time.Now()
+	Models.JobDB.Exec("UPDATE jobs SET status = 'pending', last_run = ? WHERE id = ?", now, job.Id)
+
 	ctx := context.Background()
 	queueName := "scraping_jobs"
 
@@ -163,15 +165,24 @@ func executeJob(job Models.Job) {
 
 	jobJSON, err := json.Marshal(jobPayload)
 	if err != nil {
-		Models.JobDB.Raw("UPDATE jobs SET last_result = 'failed' WHERE id = ?", job.Id)
-		Models.JobDB.Raw("UPDATE jobs SET status = 'scheduled' WHERE id = ?", job.Id)
+		Models.JobDB.Exec("UPDATE jobs SET last_result = ?, status = 'scheduled' WHERE id = ?",
+			fmt.Sprintf("failed to marshal job: %v", err), job.Id)
 		return
 	}
 
 	err = Models.RedisClient.LPush(ctx, queueName, jobJSON).Err()
 	if err != nil {
-		Models.JobDB.Raw("UPDATE jobs SET last_result = 'failed' WHERE id = ?", job.Id)
-		Models.JobDB.Raw("UPDATE jobs SET status = 'scheduled' WHERE id = ?", job.Id)
+		Models.JobDB.Exec("UPDATE jobs SET last_result = ?, status = 'scheduled' WHERE id = ?",
+			fmt.Sprintf("failed to queue job: %v", err), job.Id)
 		return
+	}
+
+	// Update next_run from the cron scheduler
+	var jobCronEntry Models.JobCronEntry
+	if res := Models.JobDB.Where("job_id = ?", job.Id).First(&jobCronEntry); res.Error == nil {
+		entry := Models.CronScheduler.Entry(jobCronEntry.EntryId)
+		if !entry.Next.IsZero() {
+			Models.JobDB.Exec("UPDATE jobs SET next_run = ? WHERE id = ?", entry.Next, job.Id)
+		}
 	}
 }

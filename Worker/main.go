@@ -16,7 +16,7 @@ func main() {
 
 	if err := Services.InitSupervisorClient(); err != nil {
 		log.Printf("Warning: Failed to connect to supervisor: %v", err)
-		log.Println("Worker will continue running but won't send completion status")
+		log.Println("Worker will continue running but won't register with supervisor")
 	}
 	defer Services.CloseSupervisorClient()
 

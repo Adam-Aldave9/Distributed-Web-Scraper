@@ -8,9 +8,9 @@ import (
 )
 
 type JobCronEntry struct {
-	Id        uuid.UUID    `json:"id" db:"id,primarykey,type:uuid"`
-	JobId     int          `json:"job_id" db:"job_id,notnull,foreignkey:job(id)"`
-	EntryId   cron.EntryID `json:"entry_id" db:"entry_id,notnull"`
+	Id        uuid.UUID    `json:"id" gorm:"primaryKey;type:uuid"`
+	JobId     int          `json:"job_id" gorm:"not null"`
+	EntryId   cron.EntryID `json:"entry_id" gorm:"not null"`
 	CreatedAt time.Time    `json:"created_at"`
 	UpdatedAt time.Time    `json:"updated_at"`
 }

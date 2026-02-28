@@ -1,6 +1,7 @@
 package Controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	DTOs "supervisor/DTOs"
@@ -86,8 +87,8 @@ func DeleteWorker(c *gin.Context) {
 }
 
 func ShutdownWorker(c *gin.Context) {
-	id := c.Param("id")
-	if _, err := strconv.Atoi(id); err != nil {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid worker ID"})
 		return
 	}
@@ -95,5 +96,5 @@ func ShutdownWorker(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Shutdown signal sent to worker " + id})
+	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Shutdown signal sent to worker %d", id)})
 }
