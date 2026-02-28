@@ -10,7 +10,6 @@ services:
       - REDIS_URL=redis://redis:6379
     volumes:
       - ./Supervisor:/app
-      - ./proto:/app/proto
     depends_on:
       - worker-info-db
       - job-info-db
@@ -19,15 +18,13 @@ services:
 
   worker:
     build: ./Worker
-    ports:
-      - "8081:8081"
     environment:
       - SCRAPING_DATA_DATABASE_URL=postgres://admin:admin@scraping-data-db:5434/scraping-data?sslmode=disable
       - JOB_INFO_DATABASE_URL=postgres://admin:admin@job-info-db:5433/job-info?sslmode=disable
       - REDIS_URL=redis://redis:6379
+      - SUPERVISOR_GRPC_ADDRESS=supervisor:50051
     volumes:
       - ./Worker:/app
-      - ./proto:/app/proto
     depends_on:
       - worker-info-db
       - job-info-db
