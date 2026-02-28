@@ -14,6 +14,7 @@ func SetupRoutes(router *gin.Engine) {
 		workers.POST("", Controllers.CreateWorker)
 		workers.PUT("/:id", Controllers.UpdateWorker)
 		workers.DELETE("/:id", Controllers.DeleteWorker)
+		workers.POST("/:id/shutdown", Controllers.ShutdownWorker)
 	}
 
 	jobs := router.Group("/jobs")

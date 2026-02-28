@@ -2,6 +2,8 @@ package Services
 
 import (
 	Models "supervisor/Models"
+
+	"github.com/google/uuid"
 )
 
 func GetAllJobCronEntries() ([]Models.JobCronEntry, error) {
@@ -21,7 +23,7 @@ func CreateJobCronEntry(jobCronEntry Models.JobCronEntry) (Models.JobCronEntry, 
 	return jobCronEntry, nil
 }
 
-func DeleteJobCronEntry(id string) (string, error) {
+func DeleteJobCronEntry(id uuid.UUID) (string, error) {
 	var jobCronEntry Models.JobCronEntry
 	result := Models.JobDB.Where("id = ?", id).Delete(&jobCronEntry)
 	if result.Error != nil {

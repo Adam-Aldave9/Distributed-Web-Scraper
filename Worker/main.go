@@ -16,7 +16,7 @@ func main() {
 
 	if err := Services.InitSupervisorClient(); err != nil {
 		log.Printf("Warning: Failed to connect to supervisor: %v", err)
-		log.Println("Worker will continue running but won't send completion status")
+		log.Println("Worker will continue running but won't register with supervisor")
 	}
 	defer Services.CloseSupervisorClient()
 
@@ -36,7 +36,7 @@ func main() {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
 	go func() {
-		if err := Services.StartGRPCServer(c); err != nil {
+		if err := Services.StartGRPCServer(ctx, c); err != nil {
 			log.Printf("gRPC server error: %v", err)
 		}
 	}()

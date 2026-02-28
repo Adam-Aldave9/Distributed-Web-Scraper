@@ -19,7 +19,7 @@ func ConnectWorkerDatabase() {
 	if err != nil {
 		panic("Failed to connect to database")
 	}
-	db.AutoMigrate(&Worker{}, &WorkerHealth{})
+	db.AutoMigrate(&Worker{})
 	WorkerDB = db
 }
 

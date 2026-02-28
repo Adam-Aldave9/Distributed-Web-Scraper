@@ -6,6 +6,7 @@ import (
 	Services "supervisor/Services"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func GetJobCronEntries(c *gin.Context) {
@@ -18,8 +19,8 @@ func GetJobCronEntries(c *gin.Context) {
 }
 
 func DeleteJobCronEntry(c *gin.Context) {
-	id := c.Param("id")
-	if id == "" {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid job cron entry ID"})
 		return
 	}
