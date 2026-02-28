@@ -84,3 +84,16 @@ func DeleteWorker(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, message)
 }
+
+func ShutdownWorker(c *gin.Context) {
+	id := c.Param("id")
+	if _, err := strconv.Atoi(id); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid worker ID"})
+		return
+	}
+	if err := Services.ShutdownWorker(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Shutdown signal sent to worker " + id})
+}

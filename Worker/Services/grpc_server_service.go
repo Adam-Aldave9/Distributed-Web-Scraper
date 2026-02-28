@@ -31,13 +31,10 @@ func DefaultWorkerServerConfig() WorkerServerConfig {
 	}
 }
 
-type RestartSignal struct{}
-
 // WorkerGRPCServer implements the WorkerService gRPC server
 type WorkerGRPCServer struct {
 	pb.UnimplementedWorkerServiceServer
 	shutdownChan chan os.Signal
-	restartChan  chan RestartSignal
 	config       WorkerServerConfig
 }
 
@@ -45,16 +42,6 @@ type WorkerGRPCServer struct {
 func NewWorkerGRPCServer(shutdownChan chan os.Signal, config WorkerServerConfig) *WorkerGRPCServer {
 	return &WorkerGRPCServer{
 		shutdownChan: shutdownChan,
-		restartChan:  make(chan RestartSignal, 1),
-		config:       config,
-	}
-}
-
-// NewWorkerGRPCServerWithRestart creates a WorkerGRPCServer with restart support
-func NewWorkerGRPCServerWithRestart(shutdownChan chan os.Signal, restartChan chan RestartSignal, config WorkerServerConfig) *WorkerGRPCServer {
-	return &WorkerGRPCServer{
-		shutdownChan: shutdownChan,
-		restartChan:  restartChan,
 		config:       config,
 	}
 }
@@ -74,39 +61,13 @@ func (s *WorkerGRPCServer) Shutdown(ctx context.Context, req *emptypb.Empty) (*p
 	}, nil
 }
 
-// Restart handles restart requests from the supervisor
-func (s *WorkerGRPCServer) Restart(ctx context.Context, req *emptypb.Empty) (*pb.RestartResponse, error) {
-	log.Println("Received restart request via gRPC")
-
-	go func() {
-		time.Sleep(100 * time.Millisecond)
-		if s.restartChan != nil {
-			select {
-			case s.restartChan <- RestartSignal{}:
-				log.Println("Restart signal sent")
-			default:
-				log.Println("Restart channel full, triggering shutdown for restart")
-				s.shutdownChan <- os.Interrupt
-			}
-		} else {
-			log.Println("No restart channel configured, falling back to shutdown")
-			s.shutdownChan <- os.Interrupt
-		}
-	}()
-
-	return &pb.RestartResponse{
-		Message:   "Restart initiated",
-		Timestamp: time.Now().Format(time.RFC3339),
-	}, nil
-}
-
 // StartGRPCServer starts the gRPC server with default configuration
-func StartGRPCServer(shutdownChan chan os.Signal) error {
-	return StartGRPCServerWithConfig(shutdownChan, DefaultWorkerServerConfig())
+func StartGRPCServer(ctx context.Context, shutdownChan chan os.Signal) error {
+	return StartGRPCServerWithConfig(ctx, shutdownChan, DefaultWorkerServerConfig())
 }
 
 // StartGRPCServerWithConfig starts the gRPC server with custom configuration
-func StartGRPCServerWithConfig(shutdownChan chan os.Signal, config WorkerServerConfig) error {
+func StartGRPCServerWithConfig(ctx context.Context, shutdownChan chan os.Signal, config WorkerServerConfig) error {
 	address := fmt.Sprintf(":%s", config.Port)
 	lis, err := net.Listen("tcp", address)
 	if err != nil {
@@ -125,6 +86,12 @@ func StartGRPCServerWithConfig(shutdownChan chan os.Signal, config WorkerServerC
 	pb.RegisterWorkerServiceServer(grpcServer, workerServer)
 
 	log.Printf("Worker gRPC server starting on port %s...", config.Port)
+
+	go func() {
+		<-ctx.Done()
+		log.Println("Shutting down gRPC server...")
+		grpcServer.GracefulStop()
+	}()
 
 	if err := grpcServer.Serve(lis); err != nil {
 		return fmt.Errorf("failed to serve gRPC server: %w", err)

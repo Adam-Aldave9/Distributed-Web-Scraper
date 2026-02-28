@@ -36,7 +36,7 @@ func main() {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
 	go func() {
-		if err := Services.StartGRPCServer(c); err != nil {
+		if err := Services.StartGRPCServer(ctx, c); err != nil {
 			log.Printf("gRPC server error: %v", err)
 		}
 	}()

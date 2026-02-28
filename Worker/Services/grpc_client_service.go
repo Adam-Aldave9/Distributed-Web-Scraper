@@ -7,14 +7,12 @@ import (
 	"os"
 	"sync"
 	"time"
-	DTOs "worker/DTOs"
 
 	pb "worker/proto"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/keepalive"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // SupervisorClientConfig holds configuration for connecting to the supervisor
@@ -130,53 +128,6 @@ func (sc *SupervisorClient) GetConfig() SupervisorClientConfig {
 	return sc.config
 }
 
-// SendCompletionStatus sends job completion status to supervisor
-func SendCompletionStatus(ctx context.Context, payload DTOs.JobPayload, status string, result string) error {
-	sc := GetSupervisorClient()
-	if sc == nil {
-		return fmt.Errorf("supervisor client not initialized")
-	}
-
-	sc.mu.RLock()
-	client := sc.client
-	config := sc.config
-	sc.mu.RUnlock()
-
-	if client == nil {
-		return fmt.Errorf("supervisor client connection lost")
-	}
-
-	req := &pb.CompletionStatusRequest{
-		JobId:         int32(payload.JobID),
-		JobName:       payload.Name,
-		Status:        status,
-		UrlSeedSearch: payload.URLSeedSearch,
-		LastResult:    result,
-		Cron:          "",
-		LastRun:       time.Now().Format(time.RFC3339),
-		NextRun:       "",
-		IsActive:      status == "completed",
-		WorkerId:      config.WorkerID,
-		CompletedAt:   timestamppb.Now(),
-	}
-
-	reqCtx, cancel := context.WithTimeout(ctx, config.RequestTimeout)
-	defer cancel()
-
-	resp, err := client.LogCompletionStatus(reqCtx, req)
-	if err != nil {
-		return fmt.Errorf("failed to send completion status: %w", err)
-	}
-
-	if !resp.Success {
-		log.Printf("Supervisor reported error: %s", resp.Message)
-		return fmt.Errorf("supervisor error: %s", resp.Message)
-	}
-
-	log.Printf("Successfully sent completion status for job %d: %s", payload.JobID, resp.Message)
-	return nil
-}
-
 // RegisterWorker registers this worker with the supervisor
 func RegisterWorker(ctx context.Context, workerId string) error {
 	sc := GetSupervisorClient()
@@ -217,178 +168,5 @@ func RegisterWorker(ctx context.Context, workerId string) error {
 	}
 
 	log.Printf("Successfully registered worker %s: %s", workerId, resp.Message)
-	return nil
-}
-
-// HeartbeatStream manages a continuous heartbeat stream to the supervisor
-type HeartbeatStream struct {
-	stream   pb.SupervisorService_HealthHeartbeatStreamClient
-	interval time.Duration
-	stopChan chan struct{}
-	mu       sync.Mutex
-	running  bool
-}
-
-var (
-	heartbeatStreamInstance *HeartbeatStream
-	heartbeatStreamMu       sync.Mutex
-)
-
-// StartHeartbeatStream starts a continuous heartbeat stream to the supervisor
-func StartHeartbeatStream(ctx context.Context, interval time.Duration) error {
-	heartbeatStreamMu.Lock()
-	defer heartbeatStreamMu.Unlock()
-
-	if heartbeatStreamInstance != nil && heartbeatStreamInstance.running {
-		return nil // Already running
-	}
-
-	sc := GetSupervisorClient()
-	if sc == nil {
-		return fmt.Errorf("supervisor client not initialized")
-	}
-
-	sc.mu.RLock()
-	client := sc.client
-	config := sc.config
-	sc.mu.RUnlock()
-
-	if client == nil {
-		return fmt.Errorf("supervisor client connection lost")
-	}
-
-	stream, err := client.HealthHeartbeatStream(ctx)
-	if err != nil {
-		return fmt.Errorf("failed to open heartbeat stream: %w", err)
-	}
-
-	heartbeatStreamInstance = &HeartbeatStream{
-		stream:   stream,
-		interval: interval,
-		stopChan: make(chan struct{}),
-		running:  true,
-	}
-
-	go func() {
-		ticker := time.NewTicker(interval)
-		defer ticker.Stop()
-		defer func() {
-			heartbeatStreamMu.Lock()
-			if heartbeatStreamInstance != nil {
-				heartbeatStreamInstance.running = false
-			}
-			heartbeatStreamMu.Unlock()
-		}()
-
-		workerId := config.WorkerID
-		heartbeatCount := 0
-
-		for {
-			select {
-			case <-ctx.Done():
-				log.Println("Heartbeat stream context cancelled, closing stream")
-				resp, err := stream.CloseAndRecv()
-				if err != nil {
-					log.Printf("Error closing heartbeat stream: %v", err)
-				} else {
-					log.Printf("Heartbeat stream closed: %s", resp.Message)
-				}
-				return
-			case <-heartbeatStreamInstance.stopChan:
-				log.Println("Heartbeat stream stopped")
-				resp, err := stream.CloseAndRecv()
-				if err != nil {
-					log.Printf("Error closing heartbeat stream: %v", err)
-				} else {
-					log.Printf("Heartbeat stream closed: %s", resp.Message)
-				}
-				return
-			case <-ticker.C:
-				heartbeatCount++
-				req := &pb.HealthHeartbeatRequest{
-					WorkerId:    workerId,
-					Timestamp:   time.Now().Format(time.RFC3339),
-					CpuUsage:    0, // TODO: get actual CPU usage
-					MemoryUsage: 0, // TODO: get actual memory usage
-					Status:      "active",
-				}
-
-				if err := stream.Send(req); err != nil {
-					log.Printf("Failed to send heartbeat #%d: %v", heartbeatCount, err)
-					return
-				}
-				log.Printf("Sent heartbeat #%d for worker %s", heartbeatCount, workerId)
-			}
-		}
-	}()
-
-	log.Printf("Started heartbeat stream for worker %s (interval: %v)", config.WorkerID, interval)
-	return nil
-}
-
-// StopHeartbeatStream stops the heartbeat stream
-func StopHeartbeatStream() {
-	heartbeatStreamMu.Lock()
-	defer heartbeatStreamMu.Unlock()
-
-	if heartbeatStreamInstance != nil && heartbeatStreamInstance.running {
-		close(heartbeatStreamInstance.stopChan)
-		heartbeatStreamInstance = nil
-	}
-}
-
-// SendHealthHeartbeat sends a single health heartbeat (for backwards compatibility)
-func SendHealthHeartbeat(ctx context.Context, workerId string) error {
-	return SendHealthHeartbeatWithMetrics(ctx, workerId, 0, 0, "active")
-}
-
-// SendHealthHeartbeatWithMetrics sends a single health heartbeat with resource metrics
-func SendHealthHeartbeatWithMetrics(ctx context.Context, workerId string, cpuUsage, memoryUsage float64, status string) error {
-	sc := GetSupervisorClient()
-	if sc == nil {
-		return fmt.Errorf("supervisor client not initialized")
-	}
-
-	sc.mu.RLock()
-	client := sc.client
-	config := sc.config
-	sc.mu.RUnlock()
-
-	if client == nil {
-		return fmt.Errorf("supervisor client connection lost")
-	}
-
-	if workerId == "" {
-		workerId = config.WorkerID
-	}
-
-	stream, err := client.HealthHeartbeatStream(ctx)
-	if err != nil {
-		return fmt.Errorf("failed to open heartbeat stream: %w", err)
-	}
-
-	req := &pb.HealthHeartbeatRequest{
-		WorkerId:    workerId,
-		Timestamp:   time.Now().Format(time.RFC3339),
-		CpuUsage:    cpuUsage,
-		MemoryUsage: memoryUsage,
-		Status:      status,
-	}
-
-	if err := stream.Send(req); err != nil {
-		return fmt.Errorf("failed to send health heartbeat: %w", err)
-	}
-
-	resp, err := stream.CloseAndRecv()
-	if err != nil {
-		return fmt.Errorf("failed to close heartbeat stream: %w", err)
-	}
-
-	if !resp.Success {
-		log.Printf("Supervisor reported error for heartbeat: %s", resp.Message)
-		return fmt.Errorf("heartbeat error: %s", resp.Message)
-	}
-
-	log.Printf("Successfully sent heartbeat for worker %s", workerId)
 	return nil
 }

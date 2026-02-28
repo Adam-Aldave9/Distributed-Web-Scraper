@@ -84,15 +84,7 @@ func (s *ScraperServiceWrapper) processJob(ctx context.Context, jobData string) 
 
 	if err := s.scrapeURL(payload); err != nil {
 		log.Printf("Error scraping URL for job %d: %v", payload.JobID, err)
-
-		if err := SendCompletionStatus(ctx, payload, "failed", "scraping failed"); err != nil {
-			log.Printf("Failed to send failure status to supervisor: %v", err)
-		}
 		return
-	}
-
-	if err := SendCompletionStatus(ctx, payload, "completed", "success"); err != nil {
-		log.Printf("Failed to send completion status to supervisor: %v", err)
 	}
 
 	log.Printf("Successfully completed job %d", payload.JobID)

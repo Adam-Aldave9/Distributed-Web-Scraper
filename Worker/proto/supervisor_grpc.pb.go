@@ -19,9 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	SupervisorService_RegisterWorker_FullMethodName        = "/proto.SupervisorService/RegisterWorker"
-	SupervisorService_HealthHeartbeatStream_FullMethodName = "/proto.SupervisorService/HealthHeartbeatStream"
-	SupervisorService_LogCompletionStatus_FullMethodName   = "/proto.SupervisorService/LogCompletionStatus"
+	SupervisorService_RegisterWorker_FullMethodName = "/proto.SupervisorService/RegisterWorker"
 )
 
 // SupervisorServiceClient is the client API for SupervisorService service.
@@ -33,10 +31,6 @@ const (
 type SupervisorServiceClient interface {
 	// RegisterWorker registers a new worker with the supervisor
 	RegisterWorker(ctx context.Context, in *RegisterWorkerRequest, opts ...grpc.CallOption) (*RegisterWorkerResponse, error)
-	// HealthHeartbeatStream receives a continuous stream of health updates from workers
-	HealthHeartbeatStream(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[HealthHeartbeatRequest, HealthHeartbeatResponse], error)
-	// LogCompletionStatus logs job completion status from workers
-	LogCompletionStatus(ctx context.Context, in *CompletionStatusRequest, opts ...grpc.CallOption) (*CompletionStatusResponse, error)
 }
 
 type supervisorServiceClient struct {
@@ -57,29 +51,6 @@ func (c *supervisorServiceClient) RegisterWorker(ctx context.Context, in *Regist
 	return out, nil
 }
 
-func (c *supervisorServiceClient) HealthHeartbeatStream(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[HealthHeartbeatRequest, HealthHeartbeatResponse], error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &SupervisorService_ServiceDesc.Streams[0], SupervisorService_HealthHeartbeatStream_FullMethodName, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &grpc.GenericClientStream[HealthHeartbeatRequest, HealthHeartbeatResponse]{ClientStream: stream}
-	return x, nil
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type SupervisorService_HealthHeartbeatStreamClient = grpc.ClientStreamingClient[HealthHeartbeatRequest, HealthHeartbeatResponse]
-
-func (c *supervisorServiceClient) LogCompletionStatus(ctx context.Context, in *CompletionStatusRequest, opts ...grpc.CallOption) (*CompletionStatusResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CompletionStatusResponse)
-	err := c.cc.Invoke(ctx, SupervisorService_LogCompletionStatus_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // SupervisorServiceServer is the server API for SupervisorService service.
 // All implementations must embed UnimplementedSupervisorServiceServer
 // for forward compatibility.
@@ -89,10 +60,6 @@ func (c *supervisorServiceClient) LogCompletionStatus(ctx context.Context, in *C
 type SupervisorServiceServer interface {
 	// RegisterWorker registers a new worker with the supervisor
 	RegisterWorker(context.Context, *RegisterWorkerRequest) (*RegisterWorkerResponse, error)
-	// HealthHeartbeatStream receives a continuous stream of health updates from workers
-	HealthHeartbeatStream(grpc.ClientStreamingServer[HealthHeartbeatRequest, HealthHeartbeatResponse]) error
-	// LogCompletionStatus logs job completion status from workers
-	LogCompletionStatus(context.Context, *CompletionStatusRequest) (*CompletionStatusResponse, error)
 	mustEmbedUnimplementedSupervisorServiceServer()
 }
 
@@ -105,12 +72,6 @@ type UnimplementedSupervisorServiceServer struct{}
 
 func (UnimplementedSupervisorServiceServer) RegisterWorker(context.Context, *RegisterWorkerRequest) (*RegisterWorkerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterWorker not implemented")
-}
-func (UnimplementedSupervisorServiceServer) HealthHeartbeatStream(grpc.ClientStreamingServer[HealthHeartbeatRequest, HealthHeartbeatResponse]) error {
-	return status.Errorf(codes.Unimplemented, "method HealthHeartbeatStream not implemented")
-}
-func (UnimplementedSupervisorServiceServer) LogCompletionStatus(context.Context, *CompletionStatusRequest) (*CompletionStatusResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method LogCompletionStatus not implemented")
 }
 func (UnimplementedSupervisorServiceServer) mustEmbedUnimplementedSupervisorServiceServer() {}
 func (UnimplementedSupervisorServiceServer) testEmbeddedByValue()                           {}
@@ -151,31 +112,6 @@ func _SupervisorService_RegisterWorker_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SupervisorService_HealthHeartbeatStream_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(SupervisorServiceServer).HealthHeartbeatStream(&grpc.GenericServerStream[HealthHeartbeatRequest, HealthHeartbeatResponse]{ServerStream: stream})
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type SupervisorService_HealthHeartbeatStreamServer = grpc.ClientStreamingServer[HealthHeartbeatRequest, HealthHeartbeatResponse]
-
-func _SupervisorService_LogCompletionStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CompletionStatusRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SupervisorServiceServer).LogCompletionStatus(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: SupervisorService_LogCompletionStatus_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SupervisorServiceServer).LogCompletionStatus(ctx, req.(*CompletionStatusRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // SupervisorService_ServiceDesc is the grpc.ServiceDesc for SupervisorService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -187,17 +123,7 @@ var SupervisorService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "RegisterWorker",
 			Handler:    _SupervisorService_RegisterWorker_Handler,
 		},
-		{
-			MethodName: "LogCompletionStatus",
-			Handler:    _SupervisorService_LogCompletionStatus_Handler,
-		},
 	},
-	Streams: []grpc.StreamDesc{
-		{
-			StreamName:    "HealthHeartbeatStream",
-			Handler:       _SupervisorService_HealthHeartbeatStream_Handler,
-			ClientStreams: true,
-		},
-	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "proto/supervisor.proto",
 }
