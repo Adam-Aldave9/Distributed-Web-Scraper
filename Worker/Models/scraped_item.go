@@ -8,7 +8,7 @@ type ScrapedItem struct {
 	ID        int       `json:"id" gorm:"primaryKey"`
 	JobID     int       `json:"job_id" gorm:"index"`
 	Title     string    `json:"title"`
-	Brand     string    `json:"brand"`
+	Rating    string    `json:"rating"`
 	Website   string    `json:"website"`
 	Price     float64   `json:"price"`
 	URL       string    `json:"url"`
