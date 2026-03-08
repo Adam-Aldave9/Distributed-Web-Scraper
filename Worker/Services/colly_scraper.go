@@ -18,7 +18,7 @@ type ScrapeConfig struct {
 	ItemSelector     string // css selector for each product card/item container
 	TitleSelector    string
 	PriceSelector    string
-	BrandSelector    string
+	RatingSelector   string
 	URLSelector      string
 	NextPageSelector string // css selector for the next page link
 	MaxDepth         int    // max pagination pages to follow (0 = unlimited)
@@ -26,13 +26,13 @@ type ScrapeConfig struct {
 
 func DefaultScrapeConfig() ScrapeConfig {
 	return ScrapeConfig{
-		ItemSelector:     "div[data-item-id]",
-		TitleSelector:    "span[data-automation-id='product-title']",
-		PriceSelector:    "div[data-automation-id='product-price'] span[itemprop='price']",
-		BrandSelector:    "span[data-automation-id='product-brand']",
-		URLSelector:      "a[link-identifier='product-title']",
-		NextPageSelector: "a[aria-label='Next page']",
-		MaxDepth:         10,
+		ItemSelector:     "article.product_pod",
+		TitleSelector:    "h3 a",
+		PriceSelector:    "p.price_color",
+		RatingSelector:   "p.star-rating",
+		URLSelector:      "h3 a",
+		NextPageSelector: "li.next a",
+		MaxDepth:         50,
 	}
 }
 
@@ -77,6 +77,7 @@ func RunScrape(db *gorm.DB, payload DTOs.JobPayload, config ScrapeConfig) (int, 
 	c := colly.NewCollector(
 		colly.MaxDepth(config.MaxDepth),
 		colly.Async(false),
+		colly.AllowedDomains("books.toscrape.com"),
 	)
 
 	c.Limit(&colly.LimitRule{
@@ -89,17 +90,18 @@ func RunScrape(db *gorm.DB, payload DTOs.JobPayload, config ScrapeConfig) (int, 
 	pagesVisited := 0
 
 	c.OnHTML(config.ItemSelector, func(e *colly.HTMLElement) {
-		title := e.ChildText(config.TitleSelector)
+		title := e.ChildAttr(config.TitleSelector, "title")
 		if title == "" {
-			title = e.ChildAttr(config.TitleSelector, "title")
+			title = e.ChildText(config.TitleSelector)
 		}
 
 		priceStr := e.ChildText(config.PriceSelector)
 		price := parsePrice(priceStr)
 
-		brand := ""
-		if config.BrandSelector != "" {
-			brand = e.ChildText(config.BrandSelector)
+		rating := ""
+		if config.RatingSelector != "" {
+			ratingClass := e.ChildAttr(config.RatingSelector, "class")
+			rating = parseRating(ratingClass)
 		}
 
 		itemURL := e.ChildAttr(config.URLSelector, "href")
@@ -110,7 +112,7 @@ func RunScrape(db *gorm.DB, payload DTOs.JobPayload, config ScrapeConfig) (int, 
 		item := Models.ScrapedItem{
 			JobID:     payload.JobID,
 			Title:     strings.TrimSpace(title),
-			Brand:     strings.TrimSpace(brand),
+			Rating:    strings.TrimSpace(rating),
 			Website:   website,
 			Price:     price,
 			URL:       itemURL,
@@ -189,4 +191,13 @@ func extractHost(rawURL string) string {
 		s = s[:idx]
 	}
 	return s
+}
+
+// parseRating extracts the rating word from a class string like "star-rating Three"
+func parseRating(class string) string {
+	parts := strings.Fields(class)
+	if len(parts) == 0 {
+		return ""
+	}
+	return parts[len(parts)-1]
 }
