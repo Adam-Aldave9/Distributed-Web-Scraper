@@ -32,7 +32,7 @@ func (s *ScraperService) StartListening(ctx context.Context) {
 	queueName := "scraping_jobs"
 	log.Printf("Starting to listen for jobs on queue: %s", queueName)
 
-	sem := make(chan struct{}, 2) // semaphore to allow max 2 parallel scraping tasks per worker node
+	sem := make(chan struct{}, WorkerCapacity) // semaphore to allow max parallel scraping tasks per worker node
 	var wg sync.WaitGroup
 
 	for {
@@ -62,10 +62,14 @@ func (s *ScraperService) StartListening(ctx context.Context) {
 			jobData := result[1]
 
 			sem <- struct{}{} // acquire slot. blocks if limit reached
+			ActiveJobCount.Add(1)
 			wg.Add(1)
 			go func(data string) {
 				defer wg.Done()
-				defer func() { <-sem }()
+				defer func() {
+					<-sem
+					ActiveJobCount.Add(-1)
+				}()
 				s.processJob(ctx, data)
 			}(jobData)
 		}
@@ -107,7 +111,19 @@ func (s *ScraperService) scrapeURL(payload DTOs.JobPayload) error {
 }
 
 func (s *ScraperService) updateJobStatus(jobID int, status string) {
-	result := s.JobDB.Model(&Models.Job{}).Where("id = ?", jobID).Update("status", status)
+	updates := map[string]interface{}{"status": status}
+	if status == "running" {
+		// Claim this job by setting worker_id
+		workerID := ""
+		if sc := GetSupervisorClient(); sc != nil {
+			workerID = sc.GetConfig().WorkerID
+		}
+		updates["worker_id"] = workerID
+	} else if status == "completed" || status == "failed" {
+		// Release ownership when done
+		updates["worker_id"] = ""
+	}
+	result := s.JobDB.Model(&Models.Job{}).Where("id = ?", jobID).Updates(updates)
 	if result.Error != nil {
 		log.Printf("Error updating job status for job %d: %v", jobID, result.Error)
 	}

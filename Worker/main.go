@@ -41,6 +41,8 @@ func main() {
 		}
 	}()
 
+	go Services.StartHeartbeat(ctx)
+
 	go func() {
 		<-c
 		log.Println("Received shutdown signal, stopping...")

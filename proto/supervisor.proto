@@ -7,6 +7,9 @@ option go_package = "./proto";
 service SupervisorService {
     // RegisterWorker registers a new worker with the supervisor
     rpc RegisterWorker(RegisterWorkerRequest) returns (RegisterWorkerResponse);
+
+    // Heartbeat sends periodic health updates from worker to supervisor
+    rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
 }
 
 message RegisterWorkerRequest {
@@ -18,4 +21,14 @@ message RegisterWorkerRequest {
 message RegisterWorkerResponse {
     bool success = 1;
     string message = 2;
+}
+
+message HeartbeatRequest {
+    string workerId = 1;
+    int32 activeJobs = 2;
+    int32 capacity = 3;
+}
+
+message HeartbeatResponse {
+    bool acknowledged = 1;
 }

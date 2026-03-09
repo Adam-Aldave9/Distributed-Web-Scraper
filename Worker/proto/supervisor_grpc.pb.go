@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v6.31.1
-// source: proto/supervisor.proto
+// source: supervisor.proto
 
 package proto
 
@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	SupervisorService_RegisterWorker_FullMethodName = "/proto.SupervisorService/RegisterWorker"
+	SupervisorService_Heartbeat_FullMethodName      = "/proto.SupervisorService/Heartbeat"
 )
 
 // SupervisorServiceClient is the client API for SupervisorService service.
@@ -31,6 +32,8 @@ const (
 type SupervisorServiceClient interface {
 	// RegisterWorker registers a new worker with the supervisor
 	RegisterWorker(ctx context.Context, in *RegisterWorkerRequest, opts ...grpc.CallOption) (*RegisterWorkerResponse, error)
+	// Heartbeat sends periodic health updates from worker to supervisor
+	Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*HeartbeatResponse, error)
 }
 
 type supervisorServiceClient struct {
@@ -51,6 +54,16 @@ func (c *supervisorServiceClient) RegisterWorker(ctx context.Context, in *Regist
 	return out, nil
 }
 
+func (c *supervisorServiceClient) Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*HeartbeatResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HeartbeatResponse)
+	err := c.cc.Invoke(ctx, SupervisorService_Heartbeat_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SupervisorServiceServer is the server API for SupervisorService service.
 // All implementations must embed UnimplementedSupervisorServiceServer
 // for forward compatibility.
@@ -60,6 +73,8 @@ func (c *supervisorServiceClient) RegisterWorker(ctx context.Context, in *Regist
 type SupervisorServiceServer interface {
 	// RegisterWorker registers a new worker with the supervisor
 	RegisterWorker(context.Context, *RegisterWorkerRequest) (*RegisterWorkerResponse, error)
+	// Heartbeat sends periodic health updates from worker to supervisor
+	Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatResponse, error)
 	mustEmbedUnimplementedSupervisorServiceServer()
 }
 
@@ -72,6 +87,9 @@ type UnimplementedSupervisorServiceServer struct{}
 
 func (UnimplementedSupervisorServiceServer) RegisterWorker(context.Context, *RegisterWorkerRequest) (*RegisterWorkerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterWorker not implemented")
+}
+func (UnimplementedSupervisorServiceServer) Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Heartbeat not implemented")
 }
 func (UnimplementedSupervisorServiceServer) mustEmbedUnimplementedSupervisorServiceServer() {}
 func (UnimplementedSupervisorServiceServer) testEmbeddedByValue()                           {}
@@ -112,6 +130,24 @@ func _SupervisorService_RegisterWorker_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SupervisorService_Heartbeat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HeartbeatRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SupervisorServiceServer).Heartbeat(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SupervisorService_Heartbeat_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SupervisorServiceServer).Heartbeat(ctx, req.(*HeartbeatRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SupervisorService_ServiceDesc is the grpc.ServiceDesc for SupervisorService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -123,7 +159,11 @@ var SupervisorService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "RegisterWorker",
 			Handler:    _SupervisorService_RegisterWorker_Handler,
 		},
+		{
+			MethodName: "Heartbeat",
+			Handler:    _SupervisorService_Heartbeat_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/supervisor.proto",
+	Metadata: "supervisor.proto",
 }

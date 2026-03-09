@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	Models "supervisor/Models"
 	Services "supervisor/Services"
@@ -29,6 +30,9 @@ func main() {
 			log.Printf("gRPC server error: %v", err)
 		}
 	}()
+
+	// Start worker health check (dead worker detection + job requeue)
+	go Services.StartWorkerHealthCheck(context.Background())
 
 	Routes.SetupRoutes(router)
 
