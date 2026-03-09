@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	pb "worker/proto"
@@ -14,6 +15,12 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/keepalive"
 )
+
+// ActiveJobCount tracks the number of currently running jobs on this worker.
+// Exported so scraper_service.go can increment/decrement it.
+var ActiveJobCount atomic.Int32
+
+const WorkerCapacity = 2 // max parallel jobs per worker
 
 // SupervisorClientConfig holds configuration for connecting to the supervisor
 type SupervisorClientConfig struct {
@@ -169,4 +176,56 @@ func RegisterWorker(ctx context.Context, workerId string) error {
 
 	log.Printf("Successfully registered worker %s: %s", workerId, resp.Message)
 	return nil
+}
+
+// StartHeartbeat sends periodic heartbeats to the supervisor.
+// Blocks until ctx is cancelled.
+func StartHeartbeat(ctx context.Context) {
+	ticker := time.NewTicker(15 * time.Second)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			log.Println("Stopping heartbeat")
+			return
+		case <-ticker.C:
+			sendHeartbeat(ctx)
+		}
+	}
+}
+
+func sendHeartbeat(ctx context.Context) {
+	sc := GetSupervisorClient()
+	if sc == nil {
+		return
+	}
+
+	sc.mu.RLock()
+	client := sc.client
+	config := sc.config
+	sc.mu.RUnlock()
+
+	if client == nil {
+		return
+	}
+
+	req := &pb.HeartbeatRequest{
+		WorkerId:   config.WorkerID,
+		ActiveJobs: ActiveJobCount.Load(),
+		Capacity:   WorkerCapacity,
+	}
+
+	reqCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	resp, err := client.Heartbeat(reqCtx, req)
+	if err != nil {
+		log.Printf("Heartbeat failed: %v", err)
+		return
+	}
+
+	if !resp.Acknowledged {
+		log.Printf("Heartbeat not acknowledged by supervisor")
+	}
 }

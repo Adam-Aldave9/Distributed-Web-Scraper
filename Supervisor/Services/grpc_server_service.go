@@ -91,6 +91,33 @@ func (s *SupervisorGRPCServer) RegisterWorker(ctx context.Context, req *pb.Regis
 	}, nil
 }
 
+// Heartbeat handles periodic health updates from workers
+func (s *SupervisorGRPCServer) Heartbeat(ctx context.Context, req *pb.HeartbeatRequest) (*pb.HeartbeatResponse, error) {
+	if req.WorkerId == "" {
+		return &pb.HeartbeatResponse{Acknowledged: false}, nil
+	}
+
+	if Models.WorkerDB != nil {
+		result := Models.WorkerDB.Model(&Models.Worker{}).Where("name = ?", req.WorkerId).Updates(map[string]interface{}{
+			"status":         "active",
+			"active_jobs":    int(req.ActiveJobs),
+			"capacity":       int(req.Capacity),
+			"last_heartbeat": time.Now(),
+			"updated_at":     time.Now(),
+		})
+		if result.Error != nil {
+			log.Printf("Error updating heartbeat for worker %s: %v", req.WorkerId, result.Error)
+			return &pb.HeartbeatResponse{Acknowledged: false}, nil
+		}
+		if result.RowsAffected == 0 {
+			log.Printf("Heartbeat from unknown worker %s, ignoring", req.WorkerId)
+			return &pb.HeartbeatResponse{Acknowledged: false}, nil
+		}
+	}
+
+	return &pb.HeartbeatResponse{Acknowledged: true}, nil
+}
+
 // StartGRPCServer starts the gRPC server with the given configuration
 func StartGRPCServer() error {
 	return StartGRPCServerWithConfig(DefaultGRPCConfig())

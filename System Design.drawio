@@ -1,4 +1,4 @@
-<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/27.0.9 Chrome/134.0.6998.205 Electron/35.4.0 Safari/537.36" version="27.0.9" pages="2">
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/27.0.9 Chrome/134.0.6998.205 Electron/35.4.0 Safari/537.36" version="27.0.9" pages="3">
   <diagram name="HLD" id="PFwhUF2VnVqAaSzGk-LK">
     <mxGraphModel dx="2503" dy="2667" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="0" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -7,7 +7,7 @@
         <mxCell id="0YvE01He6yCR4zT8M_Np-10" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#232F3D;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.client;" parent="1" vertex="1">
           <mxGeometry x="30" y="200" width="139.58" height="136" as="geometry" />
         </mxCell>
-        <object placeholders="1" c4Name="Master Node" c4Type="" c4Technology="" c4Description="" label="&lt;font&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/font&gt;&lt;/div&gt;" id="0YvE01He6yCR4zT8M_Np-11">
+        <object placeholders="1" c4Name="Supervisor" c4Type="Go/Gin" c4Technology="REST :8080, gRPC :50051" c4Description="" label="&lt;font&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/font&gt;&lt;/div&gt;" id="0YvE01He6yCR4zT8M_Np-11">
           <mxCell style="rounded=1;whiteSpace=wrap;html=1;fontSize=28;labelBackgroundColor=none;fillColor=#b1ddf0;align=center;arcSize=10;strokeColor=#10739e;metaEdit=1;resizable=0;points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];" parent="1" vertex="1">
             <mxGeometry x="520" y="216" width="240" height="120" as="geometry" />
           </mxCell>
@@ -22,17 +22,12 @@
             <mxGeometry x="1370" y="890" width="240" height="120" as="geometry" />
           </mxCell>
         </object>
-        <object placeholders="1" c4Name="In Memory Storage Layer for Worker Info/Status" c4Type="Container" c4Technology="" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="0YvE01He6yCR4zT8M_Np-15">
-          <mxCell style="shape=cylinder3;size=15;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#647687;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#314354;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="1" vertex="1">
-            <mxGeometry x="530" y="-380" width="240" height="120" as="geometry" />
-          </mxCell>
-        </object>
         <object placeholders="1" c4Name="Worker Info and Health State" c4Type="Container" c4Technology="PostgreSQL" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="0YvE01He6yCR4zT8M_Np-16">
           <mxCell style="shape=cylinder3;size=15;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#647687;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#314354;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="1" vertex="1">
             <mxGeometry x="520" y="790" width="240" height="120" as="geometry" />
           </mxCell>
         </object>
-        <object placeholders="1" c4Name="Scraping Data" c4Type="Container" c4Technology="PostgreSQL" c4Description="Description of storage type container role/responsibility." label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="0YvE01He6yCR4zT8M_Np-17">
+        <object placeholders="1" c4Name="Scraping Data" c4Type="Container" c4Technology="PostgreSQL" c4Description="" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="0YvE01He6yCR4zT8M_Np-17">
           <mxCell style="shape=cylinder3;size=15;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#647687;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#314354;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" parent="1" vertex="1">
             <mxGeometry x="2540" y="180" width="240" height="120" as="geometry" />
           </mxCell>
@@ -80,10 +75,13 @@
             <mxPoint x="638.57" y="730" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="0YvE01He6yCR4zT8M_Np-36" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=5;" parent="1" edge="1">
+        <mxCell id="new-health-check-note" value="&lt;font style=&quot;font-size: 22px;&quot;&gt;Worker Health Check (every 30s)&lt;/font&gt;&lt;div&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;- Detects dead workers (no heartbeat &amp;gt; 45s)&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;- Marks worker offline&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;- Requeues running jobs back to Redis&lt;/font&gt;&lt;/div&gt;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;size=15;fillColor=#fff2cc;strokeColor=#d6b656;align=left;spacingLeft=10;" parent="1" vertex="1">
+          <mxGeometry x="180" y="450" width="430" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="new-health-check-arrow" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;dashed=1;strokeColor=#d6b656;" parent="1" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="645" y="120" as="sourcePoint" />
-            <mxPoint x="645" y="-220" as="targetPoint" />
+            <mxPoint x="500" y="460" as="sourcePoint" />
+            <mxPoint x="590" y="400" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="0YvE01He6yCR4zT8M_Np-37" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=5;" parent="1" edge="1">
@@ -101,11 +99,11 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="0YvE01He6yCR4zT8M_Np-41" value="&lt;font style=&quot;font-size: 24px;&quot;&gt;1. Job Details on initial submission&lt;/font&gt;&lt;div&gt;&lt;span style=&quot;font-size: 24px;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;div&gt;&lt;font style=&quot;font-size: 24px;&quot;&gt;2. Store next runtime + Metadata when a job received or ready to be dispatched&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 24px;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 24px;&quot;&gt;3. Job Status Update (Queued, Dispacted)&lt;/font&gt;&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="920" y="920" width="230" height="180" as="geometry" />
+        <mxCell id="0YvE01He6yCR4zT8M_Np-41" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;Job scheduling, status,&lt;br&gt;cron entries, worker_id&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="920" y="920" width="260" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="0YvE01He6yCR4zT8M_Np-42" value="&lt;font style=&quot;font-size: 24px;&quot;&gt;4. Job Execution Start Metadata&lt;/font&gt;&lt;div&gt;&lt;span style=&quot;font-size: 24px;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;div&gt;&lt;font style=&quot;font-size: 24px;&quot;&gt;5. Completion Metadata/Results&lt;/font&gt;&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="1920" y="610" width="270" height="190" as="geometry" />
+        <mxCell id="0YvE01He6yCR4zT8M_Np-42" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;Job status + result&lt;br&gt;updates (direct DB write)&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="1920" y="610" width="270" height="60" as="geometry" />
         </mxCell>
         <mxCell id="0YvE01He6yCR4zT8M_Np-47" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=5;fillColor=#f8cecc;gradientColor=#ea6b66;strokeColor=#b85450;" parent="1" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
@@ -119,23 +117,11 @@
             <mxPoint x="1000" y="540" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="0YvE01He6yCR4zT8M_Np-49" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" parent="1" source="0YvE01He6yCR4zT8M_Np-41" target="0YvE01He6yCR4zT8M_Np-41" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
         <mxCell id="0YvE01He6yCR4zT8M_Np-65" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); font-size: 30px;&quot;&gt;gRPC&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="1420" y="485" width="140" height="30" as="geometry" />
         </mxCell>
         <mxCell id="0YvE01He6yCR4zT8M_Np-67" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); font-size: 30px;&quot;&gt;gRPC&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="1420" y="570" width="140" height="30" as="geometry" />
-        </mxCell>
-        <mxCell id="0YvE01He6yCR4zT8M_Np-77" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=5;fillColor=#f8cecc;gradientColor=#ea6b66;strokeColor=#b85450;" parent="1" edge="1">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="955" y="-40.00000000000001" as="sourcePoint" />
-            <mxPoint x="1485" y="-40.00000000000001" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="0YvE01He6yCR4zT8M_Np-78" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); font-size: 30px;&quot;&gt;gRPC&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="1348" y="-10" width="140" height="30" as="geometry" />
         </mxCell>
         <mxCell id="0YvE01He6yCR4zT8M_Np-79" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=5;fillColor=#f8cecc;gradientColor=#ea6b66;strokeColor=#b85450;" parent="1" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
@@ -146,13 +132,10 @@
         <mxCell id="0YvE01He6yCR4zT8M_Np-80" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); font-size: 30px;&quot;&gt;gRPC&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="1370" y="130" width="140" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="0YvE01He6yCR4zT8M_Np-84" value="&lt;font style=&quot;font-size: 30px;&quot;&gt;Restart Worker&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="1100" y="-160" width="230" height="180" as="geometry" />
-        </mxCell>
         <mxCell id="0YvE01He6yCR4zT8M_Np-85" value="&lt;font style=&quot;font-size: 30px;&quot;&gt;Graceful Shutdown Worker(s)&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="960" width="410" height="180" as="geometry" />
         </mxCell>
-        <mxCell id="0YvE01He6yCR4zT8M_Np-86" value="&lt;font style=&quot;font-size: 30px;&quot;&gt;Health Heartbeat Stream&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+        <mxCell id="0YvE01He6yCR4zT8M_Np-86" value="&lt;font style=&quot;font-size: 30px;&quot;&gt;Heartbeat (every 15s)&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="1050" y="480" width="360" height="180" as="geometry" />
         </mxCell>
         <mxCell id="0YvE01He6yCR4zT8M_Np-87" value="&lt;font style=&quot;font-size: 30px;&quot;&gt;Register Worker&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
@@ -168,34 +151,394 @@
             <mxGeometry x="1790" y="350" width="240" height="120" as="geometry" />
           </mxCell>
         </object>
-        <mxCell id="9fzb2t8VZv5gL_HqQMh9-1" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=5;fillColor=#f8cecc;gradientColor=#ea6b66;strokeColor=#b85450;" parent="1" edge="1">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="1520" y="390.43" as="sourcePoint" />
-            <mxPoint x="980" y="390" as="targetPoint" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="3GvMp1h6ZfQx6cOo6NHf" name="Sequences">
+    <mxGraphModel dx="1281" dy="626" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="seq-title" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;&lt;b&gt;Sample Scraping Job Sequence&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="350" width="400" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="seq-h-client" value="&lt;b&gt;Client / CLI&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="30" y="40" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="seq-h-supervisor" value="&lt;b&gt;Supervisor&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b1ddf0;strokeColor=#10739e;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="190" y="40" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="seq-h-workerdb" value="&lt;b&gt;Worker Info DB&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px&quot;&gt;PostgreSQL :5432&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#647687;strokeColor=#314354;fontColor=#ffffff;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="340" y="40" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="seq-h-jobdb" value="&lt;b&gt;Job Info DB&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px&quot;&gt;PostgreSQL :5433&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#647687;strokeColor=#314354;fontColor=#ffffff;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="510" y="40" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="seq-h-redis" value="&lt;b&gt;Redis&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px&quot;&gt;Job Queue&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d80073;strokeColor=#A50040;fontColor=#ffffff;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="680" y="40" width="90" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="seq-h-worker" value="&lt;b&gt;Worker&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b1ddf0;strokeColor=#10739e;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="830" y="40" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="seq-h-scrapingdb" value="&lt;b&gt;Scraping Data DB&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px&quot;&gt;PostgreSQL :5434&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#647687;strokeColor=#314354;fontColor=#ffffff;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="990" y="40" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="seq-ll-client" value="" style="endArrow=none;html=1;rounded=0;dashed=1;dashPattern=5 3;strokeColor=#999999;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="80" y="90" as="sourcePoint" />
+            <mxPoint x="80" y="860" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="9fzb2t8VZv5gL_HqQMh9-8" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); font-size: 30px;&quot;&gt;Completion Status&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="1120" y="400" width="285" height="30" as="geometry" />
+        <mxCell id="seq-ll-supervisor" value="" style="endArrow=none;html=1;rounded=0;dashed=1;dashPattern=5 3;strokeColor=#999999;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="240" y="90" as="sourcePoint" />
+            <mxPoint x="240" y="860" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
-        <mxCell id="9fzb2t8VZv5gL_HqQMh9-9" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); font-size: 30px;&quot;&gt;gRPC&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="1420" y="395" width="140" height="30" as="geometry" />
+        <mxCell id="seq-ll-workerdb" value="" style="endArrow=none;html=1;rounded=0;dashed=1;dashPattern=5 3;strokeColor=#999999;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="400" y="90" as="sourcePoint" />
+            <mxPoint x="400" y="860" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
-        <object placeholders="1" c4Name="Job Info" c4Type="Container" c4Technology="PostgreSQL" label="&lt;font style=&quot;font-size: 16px&quot;&gt;&lt;b&gt;%c4Name%&lt;/b&gt;&lt;/font&gt;&lt;div&gt;[%c4Type%:&amp;nbsp;%c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;&lt;font color=&quot;#E6E6E6&quot;&gt;%c4Description%&lt;/font&gt;&lt;/div&gt;" id="c0gXupaSH866OIdAO8MY-1">
-          <mxCell style="shape=cylinder3;size=15;whiteSpace=wrap;html=1;boundedLbl=1;rounded=0;labelBackgroundColor=none;fillColor=#647687;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#314354;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;" vertex="1" parent="1">
-            <mxGeometry x="1370" y="1060" width="240" height="120" as="geometry" />
-          </mxCell>
-        </object>
-        <mxCell id="c0gXupaSH866OIdAO8MY-3" value="&lt;font style=&quot;font-size: 32px;&quot;&gt;Read Only Polling Database??&amp;nbsp;&lt;/font&gt;&lt;div&gt;&lt;span style=&quot;font-size: 32px;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;div&gt;&lt;font style=&quot;font-size: 32px;&quot;&gt;Master-Slave Database Architecture?&lt;/font&gt;&lt;/div&gt;&lt;/div&gt;" style="text;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="1630" y="1060" width="332" height="240" as="geometry" />
+        <mxCell id="seq-ll-jobdb" value="" style="endArrow=none;html=1;rounded=0;dashed=1;dashPattern=5 3;strokeColor=#999999;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="570" y="90" as="sourcePoint" />
+            <mxPoint x="570" y="860" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-ll-redis" value="" style="endArrow=none;html=1;rounded=0;dashed=1;dashPattern=5 3;strokeColor=#999999;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="725" y="90" as="sourcePoint" />
+            <mxPoint x="725" y="860" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-ll-worker" value="" style="endArrow=none;html=1;rounded=0;dashed=1;dashPattern=5 3;strokeColor=#999999;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="880" y="90" as="sourcePoint" />
+            <mxPoint x="880" y="860" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-ll-scrapingdb" value="" style="endArrow=none;html=1;rounded=0;dashed=1;dashPattern=5 3;strokeColor=#999999;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1055" y="90" as="sourcePoint" />
+            <mxPoint x="1055" y="860" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-sep1" value="" style="endArrow=none;html=1;rounded=0;dashed=1;dashPattern=3 3;strokeColor=#DDDDDD;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="10" y="185" as="sourcePoint" />
+            <mxPoint x="1120" y="185" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-sep2" value="" style="endArrow=none;html=1;rounded=0;dashed=1;dashPattern=3 3;strokeColor=#DDDDDD;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="10" y="275" as="sourcePoint" />
+            <mxPoint x="1120" y="275" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-sep3" value="" style="endArrow=none;html=1;rounded=0;dashed=1;dashPattern=3 3;strokeColor=#DDDDDD;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="10" y="365" as="sourcePoint" />
+            <mxPoint x="1120" y="365" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-sep4" value="" style="endArrow=none;html=1;rounded=0;dashed=1;dashPattern=3 3;strokeColor=#DDDDDD;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="10" y="580" as="sourcePoint" />
+            <mxPoint x="1120" y="580" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-sep5" value="" style="endArrow=none;html=1;rounded=0;dashed=1;dashPattern=3 3;strokeColor=#DDDDDD;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="10" y="680" as="sourcePoint" />
+            <mxPoint x="1120" y="680" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-phase1" value="&lt;i&gt;1. Worker Registration&lt;/i&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#666666;" parent="1" vertex="1">
+          <mxGeometry y="105" width="160" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="seq-m1" value="RegisterWorker (gRPC)" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeWidth=2;strokeColor=#b85450;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="880" y="130" as="sourcePoint" />
+            <mxPoint x="240" y="130" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-m2" value="Upsert worker record" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeWidth=2;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="240" y="160" as="sourcePoint" />
+            <mxPoint x="400" y="160" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-phase2" value="&lt;i&gt;2. Job Creation&lt;/i&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#666666;" parent="1" vertex="1">
+          <mxGeometry y="195" width="160" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="seq-m3" value="POST /jobs" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeWidth=2;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="80" y="220" as="sourcePoint" />
+            <mxPoint x="240" y="220" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-m4" value="INSERT job (status=scheduled)" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeWidth=2;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="240" y="250" as="sourcePoint" />
+            <mxPoint x="570" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-phase3" value="&lt;i&gt;3. Cron Trigger&lt;/i&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#666666;" parent="1" vertex="1">
+          <mxGeometry y="285" width="160" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="seq-m5" value="UPDATE status → pending" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeWidth=2;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="240" y="310" as="sourcePoint" />
+            <mxPoint x="570" y="310" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-m6" value="LPush JobPayload" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeWidth=2;strokeColor=#d80073;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="240" y="340" as="sourcePoint" />
+            <mxPoint x="725" y="340" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-phase4" value="&lt;i&gt;4. Job Execution&lt;/i&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#666666;" parent="1" vertex="1">
+          <mxGeometry y="375" width="160" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="seq-m7" value="BRPop (job received)" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeWidth=2;strokeColor=#d80073;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="725" y="400" as="sourcePoint" />
+            <mxPoint x="880" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-m8" value="UPDATE status → running, set worker_id" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeWidth=2;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="880" y="430" as="sourcePoint" />
+            <mxPoint x="570" y="430" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-m9" value="CreateInBatches (scraped items)" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeWidth=2;strokeColor=#006600;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="880" y="470" as="sourcePoint" />
+            <mxPoint x="1055" y="470" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-loop" value="&lt;i&gt;loop [per page, batch of 50]&lt;/i&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontColor=#006600;" parent="1" vertex="1">
+          <mxGeometry x="890" y="485" width="160" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="seq-m10" value="CreateInBatches ..." style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeWidth=2;strokeColor=#006600;dashed=1;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="880" y="510" as="sourcePoint" />
+            <mxPoint x="1055" y="510" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-m11" value="UPDATE status → completed, clear worker_id" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeWidth=2;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="880" y="550" as="sourcePoint" />
+            <mxPoint x="570" y="550" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-phase5" value="&lt;i&gt;5. Heartbeat (parallel)&lt;/i&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#666666;" parent="1" vertex="1">
+          <mxGeometry y="595" width="160" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="seq-m12" value="Heartbeat (gRPC, every 15s)" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeWidth=2;strokeColor=#b85450;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="880" y="620" as="sourcePoint" />
+            <mxPoint x="240" y="620" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-m13" value="UPDATE last_heartbeat, active_jobs" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeWidth=2;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="240" y="650" as="sourcePoint" />
+            <mxPoint x="400" y="650" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-phase6" value="&lt;i&gt;6. Dead Worker Recovery&lt;/i&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#666666;" parent="1" vertex="1">
+          <mxGeometry y="695" width="160" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="seq-m14" value="Query stale workers (&gt;45s)" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeWidth=2;dashed=1;strokeColor=#d6b656;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="240" y="720" as="sourcePoint" />
+            <mxPoint x="400" y="720" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-m15" value="Mark worker offline" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeWidth=2;dashed=1;strokeColor=#d6b656;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="240" y="750" as="sourcePoint" />
+            <mxPoint x="400" y="750" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-m16" value="Reset stuck jobs (status → pending)" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeWidth=2;dashed=1;strokeColor=#d6b656;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="240" y="780" as="sourcePoint" />
+            <mxPoint x="570" y="780" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="seq-m17" value="LPush (requeue jobs)" style="endArrow=classic;html=1;rounded=0;fontSize=10;strokeWidth=2;dashed=1;strokeColor=#d6b656;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="240" y="810" as="sourcePoint" />
+            <mxPoint x="725" y="810" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
-  <diagram id="n487P4zL9cod0iSsi-2B" name="Page-2">
-    <mxGraphModel dx="561" dy="535" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+  <diagram id="fLSaA2hAdbIwMCKqobWD" name="Tables">
+    <mxGraphModel dx="1281" dy="626" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="tbl-title" value="&lt;b&gt;Database Schema&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="225" y="5" width="400" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-db1" value="&lt;b&gt;Worker Info DB&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;PostgreSQL :5432&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;dashPattern=8 4;fillColor=none;strokeColor=#314354;fontColor=#314354;align=left;verticalAlign=top;spacingTop=5;spacingLeft=10;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="10" y="40" width="270" height="330" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-db2" value="&lt;b&gt;Job Info DB&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;PostgreSQL :5433&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;dashPattern=8 4;fillColor=none;strokeColor=#314354;fontColor=#314354;align=left;verticalAlign=top;spacingTop=5;spacingLeft=10;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="290" y="40" width="270" height="620" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-db3" value="&lt;b&gt;Scraping Data DB&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;PostgreSQL :5434&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;dashPattern=8 4;fillColor=none;strokeColor=#314354;fontColor=#314354;align=left;verticalAlign=top;spacingTop=5;spacingLeft=10;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="570" y="40" width="270" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-w" value="workers" style="swimlane;fontStyle=1;align=center;startSize=30;html=1;fillColor=#647687;fontColor=#ffffff;strokeColor=#314354;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="20" y="85" width="250" height="272" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-w-pk" value="&lt;u&gt;id&lt;/u&gt; : int  PK" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-w" vertex="1">
+          <mxGeometry y="30" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-w-sep" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=10;rotatable=0;labelPosition=left;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="tbl-w" vertex="1">
+          <mxGeometry y="56" width="250" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-w-f1" value="name : string" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-w" vertex="1">
+          <mxGeometry y="64" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-w-f2" value="status : string  &lt;font color=&quot;#999&quot;&gt;idx&lt;/font&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-w" vertex="1">
+          <mxGeometry y="90" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-w-f3" value="host_name : string" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-w" vertex="1">
+          <mxGeometry y="116" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-w-f4" value="active_jobs : int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-w" vertex="1">
+          <mxGeometry y="142" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-w-f5" value="capacity : int" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-w" vertex="1">
+          <mxGeometry y="168" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-w-f6" value="last_heartbeat : timestamp  &lt;font color=&quot;#999&quot;&gt;idx&lt;/font&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-w" vertex="1">
+          <mxGeometry y="194" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-w-f7" value="created_at : timestamp" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-w" vertex="1">
+          <mxGeometry y="220" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-w-f8" value="updated_at : timestamp" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-w" vertex="1">
+          <mxGeometry y="246" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-j" value="jobs" style="swimlane;fontStyle=1;align=center;startSize=30;html=1;fillColor=#647687;fontColor=#ffffff;strokeColor=#314354;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="300" y="85" width="250" height="350" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-j-pk" value="&lt;u&gt;id&lt;/u&gt; : int  PK" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-j" vertex="1">
+          <mxGeometry y="30" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-j-sep" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=10;rotatable=0;labelPosition=left;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="tbl-j" vertex="1">
+          <mxGeometry y="56" width="250" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-j-f1" value="name : string" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-j" vertex="1">
+          <mxGeometry y="64" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-j-f2" value="status : string  &lt;font color=&quot;#999&quot;&gt;idx&lt;/font&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-j" vertex="1">
+          <mxGeometry y="90" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-j-f3" value="worker_id : string  &lt;font color=&quot;#999&quot;&gt;idx&lt;/font&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-j" vertex="1">
+          <mxGeometry y="116" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-j-f4" value="url_seed_search : string" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-j" vertex="1">
+          <mxGeometry y="142" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-j-f5" value="last_result : string" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-j" vertex="1">
+          <mxGeometry y="168" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-j-f6" value="cron : string" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-j" vertex="1">
+          <mxGeometry y="194" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-j-f7" value="last_run : timestamp?" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-j" vertex="1">
+          <mxGeometry y="220" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-j-f8" value="next_run : timestamp?  &lt;font color=&quot;#999&quot;&gt;idx&lt;/font&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-j" vertex="1">
+          <mxGeometry y="246" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-j-f9" value="is_active : bool  &lt;font color=&quot;#999&quot;&gt;idx&lt;/font&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-j" vertex="1">
+          <mxGeometry y="272" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-j-f10" value="created_at : timestamp" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-j" vertex="1">
+          <mxGeometry y="298" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-j-f11" value="updated_at : timestamp" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-j" vertex="1">
+          <mxGeometry y="324" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-jce" value="job_cron_entries" style="swimlane;fontStyle=1;align=center;startSize=30;html=1;fillColor=#647687;fontColor=#ffffff;strokeColor=#314354;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="300" y="470" width="250" height="168" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-jce-pk" value="&lt;u&gt;id&lt;/u&gt; : uuid  PK" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-jce" vertex="1">
+          <mxGeometry y="30" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-jce-sep" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=10;rotatable=0;labelPosition=left;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="tbl-jce" vertex="1">
+          <mxGeometry y="56" width="250" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-jce-f1" value="job_id : int  &lt;font color=&quot;#b85450&quot;&gt;FK&lt;/font&gt;  NOT NULL" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-jce" vertex="1">
+          <mxGeometry y="64" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-jce-f2" value="entry_id : int  NOT NULL" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-jce" vertex="1">
+          <mxGeometry y="90" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-jce-f3" value="created_at : timestamp" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-jce" vertex="1">
+          <mxGeometry y="116" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-jce-f4" value="updated_at : timestamp" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-jce" vertex="1">
+          <mxGeometry y="142" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-si" value="scraped_items" style="swimlane;fontStyle=1;align=center;startSize=30;html=1;fillColor=#647687;fontColor=#ffffff;strokeColor=#314354;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="580" y="85" width="250" height="298" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-si-pk" value="&lt;u&gt;id&lt;/u&gt; : int  PK" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-si" vertex="1">
+          <mxGeometry y="30" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-si-sep" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=10;rotatable=0;labelPosition=left;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="tbl-si" vertex="1">
+          <mxGeometry y="56" width="250" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-si-f1" value="job_id : int  &lt;font color=&quot;#999&quot;&gt;idx&lt;/font&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-si" vertex="1">
+          <mxGeometry y="64" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-si-f2" value="title : string" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-si" vertex="1">
+          <mxGeometry y="90" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-si-f3" value="rating : string" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-si" vertex="1">
+          <mxGeometry y="116" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-si-f4" value="website : string" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-si" vertex="1">
+          <mxGeometry y="142" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-si-f5" value="price : float64" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-si" vertex="1">
+          <mxGeometry y="168" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-si-f6" value="url : string" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-si" vertex="1">
+          <mxGeometry y="194" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-si-f7" value="scraped_at : timestamp  &lt;font color=&quot;#999&quot;&gt;idx&lt;/font&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-si" vertex="1">
+          <mxGeometry y="220" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-si-f8" value="created_at : timestamp" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-si" vertex="1">
+          <mxGeometry y="246" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-si-f9" value="updated_at : timestamp" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontStyle=0;html=1;fontSize=11;" parent="tbl-si" vertex="1">
+          <mxGeometry y="272" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-rel1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=ERone;endFill=0;startArrow=ERmany;startFill=0;strokeWidth=2;strokeColor=#314354;" parent="1" source="tbl-jce-f1" target="tbl-j-pk" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-rel2" value="&lt;font color=&quot;#999&quot;&gt;ref&lt;/font&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endArrow=ERone;endFill=0;startArrow=ERmany;startFill=0;strokeWidth=1.5;dashed=1;dashPattern=8 4;strokeColor=#999999;fontSize=10;" parent="1" source="tbl-j-f3" target="tbl-w-f1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tbl-rel3" value="&lt;font color=&quot;#999&quot;&gt;ref&lt;/font&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endArrow=ERone;endFill=0;startArrow=ERmany;startFill=0;strokeWidth=1.5;dashed=1;dashPattern=8 4;strokeColor=#999999;fontSize=10;" parent="1" source="tbl-si-f1" target="tbl-j-pk" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
