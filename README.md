@@ -22,3 +22,17 @@ A distributed web scraping system built using **Supervisor/Worker** architecture
 | Scraping | Colly |
 | Database | PostgreSQL (x3) + GORM |
 | Containerisation | Docker / Docker Compose |
+
+## Scaling Workers
+
+Workers are stateless and can be scaled up at any time without restarting the system. Each new worker automatically registers itself with the Supervisor via gRPC and begins consuming jobs from the Redis queue immediately.
+
+**Start with multiple workers:**
+```bash
+docker compose up --build --scale worker=3
+```
+
+**Scale up while the system is running:**
+```bash
+docker compose up --scale worker=5 -d
+```
