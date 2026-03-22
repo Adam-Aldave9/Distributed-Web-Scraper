@@ -32,7 +32,7 @@ services:
       - redis
 
   worker-info-db:
-    image: postgres
+    image: postgres:17
     container_name: worker-info-db
     environment:
       POSTGRES_DB: worker-info
@@ -46,7 +46,7 @@ services:
       - "5432:5432"
 
   job-info-db:
-    image: postgres
+    image: postgres:17
     container_name: job-info-db
     environment:
       POSTGRES_DB: job-info
@@ -60,7 +60,7 @@ services:
       - "5433:5433"
 
   scraping-data-db:
-    image: postgres
+    image: postgres:17
     container_name: scraping-data-db
     environment:
       POSTGRES_DB: scraping-data

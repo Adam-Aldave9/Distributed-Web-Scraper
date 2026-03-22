@@ -119,9 +119,6 @@ func (s *ScraperService) updateJobStatus(jobID int, status string) {
 			workerID = sc.GetConfig().WorkerID
 		}
 		updates["worker_id"] = workerID
-	} else if status == "completed" || status == "failed" {
-		// Release ownership when done
-		updates["worker_id"] = ""
 	}
 	result := s.JobDB.Model(&Models.Job{}).Where("id = ?", jobID).Updates(updates)
 	if result.Error != nil {
