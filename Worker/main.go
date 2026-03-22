@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 	Services "worker/Services"
 )
 
@@ -20,12 +21,23 @@ func main() {
 	}
 	defer Services.CloseSupervisorClient()
 
-	if sc := Services.GetSupervisorClient(); sc != nil {
-		ctx := context.Background()
-		if err := Services.RegisterWorker(ctx, ""); err != nil {
-			log.Printf("Warning: Failed to register with supervisor: %v", err)
+	// Register with supervisor, retrying until successful or context cancelled
+	go func() {
+		sc := Services.GetSupervisorClient()
+		if sc == nil {
+			return
 		}
-	}
+		maxRetries := 10
+		for i := 0; i < maxRetries; i++ {
+			if err := Services.RegisterWorker(context.Background(), ""); err != nil {
+				log.Printf("Registration attempt %d/%d failed: %v", i+1, maxRetries, err)
+				time.Sleep(time.Duration(i+1) * 2 * time.Second)
+				continue
+			}
+			return
+		}
+		log.Println("Warning: Failed to register with supervisor after all retries")
+	}()
 
 	scraperService := Services.NewScraperService(RedisClient, ScrapingDB, JobDB)
 

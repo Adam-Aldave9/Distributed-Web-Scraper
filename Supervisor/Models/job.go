@@ -10,8 +10,8 @@ type Job struct {
 	URLSeedSearch string     `json:"url_seed_search"`
 	LastResult    string     `json:"last_result"`
 	Cron          string     `json:"cron"`
-	LastRun       *time.Time `json:"last_run"`
-	NextRun       *time.Time `json:"next_run" gorm:"index"`
+	LastRun       *time.Time `json:"last_run" gorm:"type:timestamptz"`
+	NextRun       *time.Time `json:"next_run" gorm:"type:timestamptz;index"`
 	IsActive      bool       `json:"is_active" gorm:"index"`
 	CreatedAt     time.Time  `json:"created_at"`
 	UpdatedAt     time.Time  `json:"updated_at"`

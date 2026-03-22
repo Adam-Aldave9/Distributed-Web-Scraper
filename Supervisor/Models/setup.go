@@ -28,6 +28,10 @@ func ConnectJobDatabase() {
 	if err != nil {
 		panic("Failed to connect to database")
 	}
+	// Fix column types if they were previously created as text instead of timestamptz
+	db.Exec("ALTER TABLE jobs ALTER COLUMN last_run TYPE timestamptz USING NULLIF(last_run, '')::timestamptz")
+	db.Exec("ALTER TABLE jobs ALTER COLUMN next_run TYPE timestamptz USING NULLIF(next_run, '')::timestamptz")
+
 	db.AutoMigrate(&Job{}, &JobCronEntry{})
 	JobDB = db
 }

@@ -46,7 +46,7 @@ func CreateJob(job Models.Job) (Models.Job, error) {
 	return job, nil
 }
 
-func UpdateJob(job Models.Job) (Models.Job, error) { //nt:: check raw
+func UpdateJob(job Models.Job) (Models.Job, error) {
 	// update next run if necessary
 	if job.Cron != "" {
 		job.NextRun = nil
@@ -55,16 +55,22 @@ func UpdateJob(job Models.Job) (Models.Job, error) { //nt:: check raw
 	if result.Error != nil {
 		return Models.Job{}, result.Error
 	}
-	if job.Cron != "" {
-		var jobCronEntry Models.JobCronEntry
-		result := Models.JobDB.Where("job_id = ?", job.Id).First(&jobCronEntry)
 
-		if result.Error == nil {
-			// Record exists, remove from scheduler
-			Models.CronScheduler.Remove(jobCronEntry.EntryId)
-		}
-		scheduleJob(job)
+	// Remove existing cron entry if present
+	var jobCronEntry Models.JobCronEntry
+	hadCronEntry := Models.JobDB.Where("job_id = ?", job.Id).First(&jobCronEntry).Error == nil
+	if hadCronEntry {
+		Models.CronScheduler.Remove(jobCronEntry.EntryId)
 	}
+
+	// Only (re)schedule if active and has a cron expression
+	if job.IsActive && job.Cron != "" {
+		scheduleJob(job)
+	} else if !job.IsActive {
+		Models.JobDB.Exec("UPDATE jobs SET next_run = NULL WHERE id = ?", job.Id)
+		job.NextRun = nil
+	}
+
 	return job, nil
 }
 
@@ -85,13 +91,24 @@ func DeleteJob(id int) (string, error) { //nt:: check raw
 }
 
 func LoadAndScheduleAllJobs() error {
+	// Clear any leftover jobs in the Redis queue from a previous run
+	ctx := context.Background()
+	if err := Models.RedisClient.Del(ctx, "scraping_jobs").Err(); err != nil {
+		fmt.Println("Warning: failed to clear scraping_jobs queue:", err)
+	} else {
+		fmt.Println("Cleared scraping_jobs Redis queue on startup")
+	}
+
+	// Reset stale "pending"/"running" jobs back to "scheduled" since the queue was just flushed
+	Models.JobDB.Exec("UPDATE jobs SET status = 'scheduled' WHERE status IN ('pending', 'running')")
+
 	jobs, err := GetAllJobs()
 	if err != nil {
 		return err
 	}
 
 	for _, job := range jobs {
-		if job.IsActive {
+		if job.IsActive && job.Status != "completed" && job.Status != "failed" {
 			scheduleJob(job)
 		}
 	}
@@ -150,6 +167,17 @@ func scheduleJob(job Models.Job) {
 }
 
 func executeJob(job Models.Job) {
+	// Re-read the job from DB to check current is_active state
+	var current Models.Job
+	if err := Models.JobDB.First(&current, job.Id).Error; err != nil {
+		fmt.Println("Error reading job before execution:", err)
+		return
+	}
+	if !current.IsActive {
+		fmt.Printf("Skipping job %d (%s): is_active=false\n", job.Id, job.Name)
+		return
+	}
+
 	now := time.Now()
 	Models.JobDB.Exec("UPDATE jobs SET status = 'pending', last_run = ? WHERE id = ?", now, job.Id)
 
