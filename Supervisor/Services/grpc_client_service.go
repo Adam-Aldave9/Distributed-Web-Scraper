@@ -15,14 +15,12 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// WorkerClientConfig holds configuration for connecting to workers
 type WorkerClientConfig struct {
 	Port           string
 	ConnectTimeout time.Duration
 	RequestTimeout time.Duration
 }
 
-// DefaultWorkerClientConfig returns default configuration for worker clients
 func DefaultWorkerClientConfig() WorkerClientConfig {
 	port := os.Getenv("WORKER_GRPC_PORT")
 	if port == "" {
@@ -35,12 +33,10 @@ func DefaultWorkerClientConfig() WorkerClientConfig {
 	}
 }
 
-// ShutdownWorker sends a graceful shutdown request to a worker
 func ShutdownWorker(workerId int) error {
 	return ShutdownWorkerWithConfig(workerId, DefaultWorkerClientConfig())
 }
 
-// ShutdownWorkerWithConfig sends a graceful shutdown request with custom config
 func ShutdownWorkerWithConfig(workerId int, config WorkerClientConfig) error {
 	worker, err := GetWorkerById(workerId)
 	if err != nil {

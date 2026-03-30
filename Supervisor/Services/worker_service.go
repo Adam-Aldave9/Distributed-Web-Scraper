@@ -8,6 +8,8 @@ import (
 	"time"
 
 	Models "supervisor/Models"
+
+	"gorm.io/gorm"
 )
 
 func GetAllWorkers() ([]Models.Worker, error) {
@@ -58,11 +60,11 @@ func DeleteWorker(id int) (string, error) {
 }
 
 const (
-	heartbeatTimeout = 45 * time.Second // worker considered dead after this
+	heartbeatTimeout    = 45 * time.Second // worker considered dead after this
 	healthCheckInterval = 30 * time.Second
 )
 
-// StartWorkerHealthCheck periodically checks for dead workers and requeues their jobs.
+// periodically checks for dead workers and requeues their jobs.
 // Blocks until ctx is cancelled.
 func StartWorkerHealthCheck(ctx context.Context) {
 	ticker := time.NewTicker(healthCheckInterval)
@@ -96,13 +98,11 @@ func checkAndRecover(ctx context.Context) {
 		log.Printf("Worker %s (id=%d) missed heartbeat (last: %s), marking offline",
 			worker.Name, worker.Id, worker.LastHeartbeat.Format(time.RFC3339))
 
-		// Mark worker offline
 		Models.WorkerDB.Model(&worker).Updates(map[string]interface{}{
 			"status":     "offline",
 			"updated_at": time.Now(),
 		})
 
-		// Requeue any running jobs owned by this worker
 		requeueWorkerJobs(ctx, worker.Name)
 	}
 }
@@ -120,14 +120,10 @@ func requeueWorkerJobs(ctx context.Context, workerName string) {
 	}
 
 	queueName := "scraping_jobs"
-	for _, job := range stuckJobs {
-		// Reset job state
-		Models.JobDB.Model(&job).Updates(map[string]interface{}{
-			"status":    "pending",
-			"worker_id": "",
-		})
+	requeuedCount := 0
 
-		// Push back to Redis queue
+	for _, job := range stuckJobs {
+		// Marshal payload before the transaction
 		jobPayload := map[string]interface{}{
 			"job_id":          job.Id,
 			"name":            job.Name,
@@ -141,14 +137,33 @@ func requeueWorkerJobs(ctx context.Context, workerName string) {
 			continue
 		}
 
-		err = Models.RedisClient.LPush(ctx, queueName, jobJSON).Err()
+		// DB update + Redis push in a transaction. If Redis fails, the DB update rolls back and the job stays as "running"
+		// The next health check cycle will retry it.
+		err = Models.JobDB.Transaction(func(tx *gorm.DB) error {
+			if err := tx.Model(&job).Updates(map[string]interface{}{
+				"status":    "pending",
+				"worker_id": "",
+			}).Error; err != nil {
+				return fmt.Errorf("db update failed: %w", err)
+			}
+
+			if err := Models.RedisClient.LPush(ctx, queueName, jobJSON).Err(); err != nil {
+				return fmt.Errorf("redis push failed: %w", err)
+			}
+
+			return nil
+		})
+
 		if err != nil {
-			log.Printf("Error requeuing job %d to Redis: %v", job.Id, err)
+			log.Printf("Error requeuing job %d from worker %s: %v", job.Id, workerName, err)
 			continue
 		}
 
+		requeuedCount++
 		log.Printf("Requeued job %d (%s) from dead worker %s", job.Id, job.Name, workerName)
 	}
 
-	fmt.Printf("Requeued %d jobs from dead worker %s\n", len(stuckJobs), workerName)
+	if requeuedCount > 0 {
+		fmt.Printf("Requeued %d/%d jobs from dead worker %s\n", requeuedCount, len(stuckJobs), workerName)
+	}
 }

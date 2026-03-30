@@ -15,13 +15,13 @@ import (
 )
 
 type ScrapeConfig struct {
-	ItemSelector     string // css selector for each product card/item container
+	ItemSelector     string
 	TitleSelector    string
 	PriceSelector    string
 	RatingSelector   string
 	URLSelector      string
-	NextPageSelector string // css selector for the next page link
-	MaxDepth         int    // max pagination pages to follow (0 = unlimited)
+	NextPageSelector string
+	MaxDepth         int
 }
 
 func DefaultScrapeConfig() ScrapeConfig {
@@ -36,14 +36,14 @@ func DefaultScrapeConfig() ScrapeConfig {
 	}
 }
 
-// runScrape blocks until scraping is complete
+// blocks until scraping is complete
 func RunScrape(db *gorm.DB, payload DTOs.JobPayload, config ScrapeConfig) (int, error) {
 	resultsChan := make(chan Models.ScrapedItem, 100)
 	var aggregatorWg sync.WaitGroup
 	var dbErr error
 	totalSaved := 0
 
-	// aggregator goroutine: reads from channel, batches, writes to db
+	// batches channel items and flushes to db
 	aggregatorWg.Add(1)
 	go func() {
 		defer aggregatorWg.Done()
@@ -163,7 +163,7 @@ func RunScrape(db *gorm.DB, payload DTOs.JobPayload, config ScrapeConfig) (int, 
 	return totalSaved, nil
 }
 
-// parsePrice extracts a float64 from a price string like $12.34
+// e.g. "$12.34" -> 12.34
 func parsePrice(s string) float64 {
 	cleaned := strings.Map(func(r rune) rune {
 		if (r >= '0' && r <= '9') || r == '.' {
