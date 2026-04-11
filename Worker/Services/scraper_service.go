@@ -43,7 +43,7 @@ func (s *ScraperService) StartListening(ctx context.Context) {
 			log.Println("All active jobs completed.")
 			return
 		default:
-			// result[0] is queue name, result[1] is data
+			// BRPop returns [queue_name, data]
 			result, err := s.RedisClient.BRPop(ctx, 5*time.Second, queueName).Result()
 			if err != nil {
 				if err == redis.Nil {
@@ -113,7 +113,6 @@ func (s *ScraperService) scrapeURL(payload DTOs.JobPayload) error {
 func (s *ScraperService) updateJobStatus(jobID int, status string) {
 	updates := map[string]interface{}{"status": status}
 	if status == "running" {
-		// Claim this job by setting worker_id
 		workerID := ""
 		if sc := GetSupervisorClient(); sc != nil {
 			workerID = sc.GetConfig().WorkerID

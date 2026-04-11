@@ -15,12 +15,10 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// WorkerServerConfig holds gRPC server configuration for worker
 type WorkerServerConfig struct {
 	Port string
 }
 
-// DefaultWorkerServerConfig returns default gRPC server configuration
 func DefaultWorkerServerConfig() WorkerServerConfig {
 	port := os.Getenv("WORKER_GRPC_PORT")
 	if port == "" {
@@ -31,14 +29,12 @@ func DefaultWorkerServerConfig() WorkerServerConfig {
 	}
 }
 
-// WorkerGRPCServer implements the WorkerService gRPC server
 type WorkerGRPCServer struct {
 	pb.UnimplementedWorkerServiceServer
 	shutdownChan chan os.Signal
 	config       WorkerServerConfig
 }
 
-// NewWorkerGRPCServer creates a new WorkerGRPCServer
 func NewWorkerGRPCServer(shutdownChan chan os.Signal, config WorkerServerConfig) *WorkerGRPCServer {
 	return &WorkerGRPCServer{
 		shutdownChan: shutdownChan,
@@ -46,7 +42,6 @@ func NewWorkerGRPCServer(shutdownChan chan os.Signal, config WorkerServerConfig)
 	}
 }
 
-// Shutdown handles graceful shutdown requests from the supervisor
 func (s *WorkerGRPCServer) Shutdown(ctx context.Context, req *emptypb.Empty) (*pb.ShutdownResponse, error) {
 	log.Println("Received shutdown request via gRPC")
 
@@ -61,12 +56,10 @@ func (s *WorkerGRPCServer) Shutdown(ctx context.Context, req *emptypb.Empty) (*p
 	}, nil
 }
 
-// StartGRPCServer starts the gRPC server with default configuration
 func StartGRPCServer(ctx context.Context, shutdownChan chan os.Signal) error {
 	return StartGRPCServerWithConfig(ctx, shutdownChan, DefaultWorkerServerConfig())
 }
 
-// StartGRPCServerWithConfig starts the gRPC server with custom configuration
 func StartGRPCServerWithConfig(ctx context.Context, shutdownChan chan os.Signal, config WorkerServerConfig) error {
 	address := fmt.Sprintf(":%s", config.Port)
 	lis, err := net.Listen("tcp", address)

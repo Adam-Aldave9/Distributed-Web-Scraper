@@ -16,13 +16,15 @@ import (
 	"google.golang.org/grpc/keepalive"
 )
 
-// ActiveJobCount tracks the number of currently running jobs on this worker.
-// Exported so scraper_service.go can increment/decrement it.
+// shared with scraper_service.go for heartbeat reporting
 var ActiveJobCount atomic.Int32
 
 const WorkerCapacity = 2 // max parallel jobs per worker
 
-// SupervisorClientConfig holds configuration for connecting to the supervisor
+const maxHeartbeatFailures = 3
+
+var consecutiveHeartbeatFailures atomic.Int32
+
 type SupervisorClientConfig struct {
 	Address        string
 	WorkerID       string
@@ -32,7 +34,6 @@ type SupervisorClientConfig struct {
 	RequestTimeout time.Duration
 }
 
-// DefaultSupervisorClientConfig returns default configuration for supervisor client
 func DefaultSupervisorClientConfig() SupervisorClientConfig {
 	address := os.Getenv("SUPERVISOR_GRPC_ADDRESS")
 	if address == "" {
@@ -58,7 +59,7 @@ func DefaultSupervisorClientConfig() SupervisorClientConfig {
 	}
 }
 
-// SupervisorClient wraps the gRPC client with thread-safe operations
+// wraps the gRPC client with thread-safe operations
 type SupervisorClient struct {
 	mu     sync.RWMutex
 	conn   *grpc.ClientConn
@@ -71,17 +72,14 @@ var (
 	supervisorClientOnce     sync.Once
 )
 
-// GetSupervisorClient returns the singleton supervisor client instance
 func GetSupervisorClient() *SupervisorClient {
 	return supervisorClientInstance
 }
 
-// InitSupervisorClient initializes the supervisor client with default config
 func InitSupervisorClient() error {
 	return InitSupervisorClientWithConfig(DefaultSupervisorClientConfig())
 }
 
-// InitSupervisorClientWithConfig initializes the supervisor client with custom config
 func InitSupervisorClientWithConfig(config SupervisorClientConfig) error {
 	var initErr error
 
@@ -114,7 +112,6 @@ func InitSupervisorClientWithConfig(config SupervisorClientConfig) error {
 	return initErr
 }
 
-// CloseSupervisorClient closes the supervisor connection
 func CloseSupervisorClient() {
 	if supervisorClientInstance != nil {
 		supervisorClientInstance.mu.Lock()
@@ -128,14 +125,45 @@ func CloseSupervisorClient() {
 	}
 }
 
-// GetConfig returns the current configuration
+// closes the existing gRPC connection and establishes a new one.
+// used to recover from connection failures detected by heartbeat.
+func (sc *SupervisorClient) Reconnect() error {
+	sc.mu.Lock()
+	defer sc.mu.Unlock()
+
+	if sc.conn != nil {
+		sc.conn.Close()
+		sc.conn = nil
+		sc.client = nil
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), sc.config.ConnectTimeout)
+	defer cancel()
+
+	conn, err := grpc.DialContext(ctx, sc.config.Address,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithKeepaliveParams(keepalive.ClientParameters{
+			Time:                30 * time.Second,
+			Timeout:             10 * time.Second,
+			PermitWithoutStream: true,
+		}),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to reconnect to supervisor at %s: %w", sc.config.Address, err)
+	}
+
+	sc.conn = conn
+	sc.client = pb.NewSupervisorServiceClient(conn)
+	log.Printf("Reconnected to supervisor gRPC service at %s", sc.config.Address)
+	return nil
+}
+
 func (sc *SupervisorClient) GetConfig() SupervisorClientConfig {
 	sc.mu.RLock()
 	defer sc.mu.RUnlock()
 	return sc.config
 }
 
-// RegisterWorker registers this worker with the supervisor
 func RegisterWorker(ctx context.Context, workerId string) error {
 	sc := GetSupervisorClient()
 	if sc == nil {
@@ -178,8 +206,7 @@ func RegisterWorker(ctx context.Context, workerId string) error {
 	return nil
 }
 
-// StartHeartbeat sends periodic heartbeats to the supervisor.
-// Blocks until ctx is cancelled.
+// blocks until ctx is cancelled
 func StartHeartbeat(ctx context.Context) {
 	ticker := time.NewTicker(15 * time.Second)
 	defer ticker.Stop()
@@ -206,8 +233,17 @@ func sendHeartbeat(ctx context.Context) {
 	config := sc.config
 	sc.mu.RUnlock()
 
+	// No active connection — attempt reconnect before sending
 	if client == nil {
-		return
+		log.Println("Heartbeat: no active connection, attempting reconnect")
+		if err := sc.Reconnect(); err != nil {
+			log.Printf("Heartbeat skipped, reconnect failed: %v", err)
+			return
+		}
+		sc.mu.RLock()
+		client = sc.client
+		config = sc.config
+		sc.mu.RUnlock()
 	}
 
 	req := &pb.HeartbeatRequest{
@@ -221,11 +257,26 @@ func sendHeartbeat(ctx context.Context) {
 
 	resp, err := client.Heartbeat(reqCtx, req)
 	if err != nil {
-		log.Printf("Heartbeat failed: %v", err)
+		failures := consecutiveHeartbeatFailures.Add(1)
+		log.Printf("Heartbeat failed (%d consecutive): %v", failures, err)
+
+		if failures >= maxHeartbeatFailures {
+			log.Printf("Too many heartbeat failures, attempting reconnect")
+			if reconnErr := sc.Reconnect(); reconnErr != nil {
+				log.Printf("Reconnect failed: %v", reconnErr)
+			} else {
+				consecutiveHeartbeatFailures.Store(0)
+			}
+		}
 		return
 	}
 
+	consecutiveHeartbeatFailures.Store(0)
+
 	if !resp.Acknowledged {
-		log.Printf("Heartbeat not acknowledged by supervisor")
+		log.Printf("Heartbeat not acknowledged, re-registering with supervisor")
+		if regErr := RegisterWorker(ctx, config.WorkerID); regErr != nil {
+			log.Printf("Re-registration failed: %v", regErr)
+		}
 	}
 }

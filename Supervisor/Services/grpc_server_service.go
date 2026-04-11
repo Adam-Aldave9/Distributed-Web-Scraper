@@ -15,12 +15,10 @@ import (
 	"google.golang.org/grpc/keepalive"
 )
 
-// GRPCConfig holds gRPC server configuration
 type GRPCConfig struct {
 	Port string
 }
 
-// DefaultGRPCConfig returns default gRPC configuration
 func DefaultGRPCConfig() GRPCConfig {
 	port := os.Getenv("GRPC_PORT")
 	if port == "" {
@@ -31,20 +29,17 @@ func DefaultGRPCConfig() GRPCConfig {
 	}
 }
 
-// SupervisorGRPCServer implements the SupervisorService gRPC server
 type SupervisorGRPCServer struct {
 	pb.UnimplementedSupervisorServiceServer
 	config GRPCConfig
 }
 
-// NewSupervisorGRPCServer creates a new SupervisorGRPCServer with the given config
 func NewSupervisorGRPCServer(config GRPCConfig) *SupervisorGRPCServer {
 	return &SupervisorGRPCServer{
 		config: config,
 	}
 }
 
-// RegisterWorker registers a new worker with the supervisor
 func (s *SupervisorGRPCServer) RegisterWorker(ctx context.Context, req *pb.RegisterWorkerRequest) (*pb.RegisterWorkerResponse, error) {
 	if req.WorkerId == "" {
 		return &pb.RegisterWorkerResponse{
@@ -91,7 +86,6 @@ func (s *SupervisorGRPCServer) RegisterWorker(ctx context.Context, req *pb.Regis
 	}, nil
 }
 
-// Heartbeat handles periodic health updates from workers
 func (s *SupervisorGRPCServer) Heartbeat(ctx context.Context, req *pb.HeartbeatRequest) (*pb.HeartbeatResponse, error) {
 	if req.WorkerId == "" {
 		return &pb.HeartbeatResponse{Acknowledged: false}, nil
@@ -118,12 +112,10 @@ func (s *SupervisorGRPCServer) Heartbeat(ctx context.Context, req *pb.HeartbeatR
 	return &pb.HeartbeatResponse{Acknowledged: true}, nil
 }
 
-// StartGRPCServer starts the gRPC server with the given configuration
 func StartGRPCServer() error {
 	return StartGRPCServerWithConfig(DefaultGRPCConfig())
 }
 
-// StartGRPCServerWithConfig starts the gRPC server with custom configuration
 func StartGRPCServerWithConfig(config GRPCConfig) error {
 	address := fmt.Sprintf(":%s", config.Port)
 	lis, err := net.Listen("tcp", address)

@@ -18,7 +18,6 @@ import (
 
 const testBufSize = 1024 * 1024
 
-// setupWorkerTestServer starts an in-memory gRPC server and returns a client.
 func setupWorkerTestServer(t *testing.T, shutdownChan chan os.Signal) (pb.WorkerServiceClient, func()) {
 	t.Helper()
 
